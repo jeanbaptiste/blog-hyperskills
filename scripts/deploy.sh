@@ -67,14 +67,21 @@ echo ""
 echo "All checks passed."
 echo ""
 
-# 2. Deploy to VM
+# 2. Generate hyperskill links
+echo "--- Generating hyperskill links ---"
+cd "$REPO_DIR"
+npm install --silent 2>/dev/null
+node scripts/generate-hyperskill-links.js
+echo ""
+
+# 3. Deploy to VM
 echo "--- Deploying to VM ---"
 scp "$REPO_DIR"/*.html "$REPO_DIR"/fonts.css "$REMOTE"
 scp -r "$REPO_DIR"/fonts "$REMOTE"
 echo "VM deploy done."
 echo ""
 
-# 3. Git commit + push (triggers GitHub Actions → GitHub Pages)
+# 4. Git commit + push (triggers GitHub Actions → GitHub Pages)
 echo "--- Git push ---"
 cd "$REPO_DIR"
 git add -A

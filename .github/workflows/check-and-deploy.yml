@@ -64,12 +64,28 @@ jobs:
               ERRORS=$((ERRORS + 1))
             fi
 
-            # EN/FR toggle — check for i18n mechanism
+            # article:published_time (articles only, not index)
+            if [ "$(basename "$f")" != "index.html" ]; then
+              if ! grep -qi 'article:published_time' "$f"; then
+                echo "  FAIL: missing article:published_time"
+                ERRORS=$((ERRORS + 1))
+              fi
+            fi
+
+            # Hyperskill share link (articles only, not index)
+            if [ "$(basename "$f")" != "index.html" ]; then
+              if ! grep -qi 'Share as hyperskill' "$f"; then
+                echo "  FAIL: missing hyperskill share link"
+                ERRORS=$((ERRORS + 1))
+              fi
+            fi
+
+            # EN/FR toggle
             if ! grep -qi 'i18n\|lang-content\|data-lang\|setLang\|switchLang\|lang="en"\|lang="fr"' "$f"; then
               echo "  WARN: no EN/FR toggle detected"
             fi
 
-            # Dark mode default — should NOT auto-detect prefers-color-scheme
+            # Dark mode default
             if grep -qi 'prefers-color-scheme.*dark.*?.*dark' "$f"; then
               echo "  FAIL: dark mode auto-detects system preference (should default to light)"
               ERRORS=$((ERRORS + 1))

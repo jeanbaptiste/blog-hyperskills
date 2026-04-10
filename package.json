@@ -1,0 +1,11 @@
+{
+  "name": "blog-hyperskills",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate-links": "node scripts/generate-hyperskill-links.js"
+  },
+  "dependencies": {
+    "hyperskills": "^0.1.0"
+  }
+}
