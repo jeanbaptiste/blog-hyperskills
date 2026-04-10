@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HyperSkills Blog</title>
+<meta name="description" content="Articles about hyperskills, digital commons, AI agents, and open data.">
+<link rel="stylesheet" href="./fonts.css">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #fefefe;
+    --accent: #2563eb;
+    --muted: #64748b;
+    --rule: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Instrument Sans', -apple-system, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Header ---------- */
+  .header {
+    border-bottom: 2px solid var(--ink);
+    padding: 24px 32px;
+  }
+  .header-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .lang-toggle {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+  .lang-toggle button {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+    color: var(--muted);
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .lang-toggle button:hover {
+    color: var(--ink);
+  }
+  .lang-toggle button.active {
+    color: var(--ink);
+    background: var(--rule);
+    font-weight: 500;
+  }
+
+  /* ---------- Main ---------- */
+  main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 60px 32px 80px;
+  }
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: var(--muted);
+    margin-bottom: 48px;
+  }
+
+  /* ---------- Article list ---------- */
+  .articles {
+    list-style: none;
+  }
+  .articles li {
+    padding: 32px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .articles li:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+  .article-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .article-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+  .article-title a {
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .article-title a:hover {
+    color: var(--accent);
+  }
+  .article-desc {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 32px 32px;
+    border-top: 2px solid var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+  footer a {
+    color: var(--muted);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  footer a:hover {
+    color: var(--ink);
+  }
+
+  /* ---------- i18n ---------- */
+  .i18n-fr { display: none; }
+  html[lang="fr"] .i18n-fr { display: revert; }
+  html[lang="fr"] .i18n-en { display: none; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 600px) {
+    .header { padding: 16px 20px; }
+    main { padding: 40px 20px 60px; }
+    footer { padding: 24px 20px; }
+    .articles li { padding: 24px 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="https://blog.hyperskills.net" class="brand">HyperSkills Blog</a>
+    <div class="lang-toggle">
+      <button id="btn-en" class="active" onclick="switchLang('en')">EN</button>
+      <button id="btn-fr" onclick="switchLang('fr')">FR</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <h1>
+    <span class="i18n-en">Articles</span>
+    <span class="i18n-fr">Articles</span>
+  </h1>
+  <p class="subtitle">
+    <span class="i18n-en">On hyperskills, digital commons, AI agents and open data.</span>
+    <span class="i18n-fr">Sur les hyperskills, les communs num&eacute;riques, les agents IA et les donn&eacute;es ouvertes.</span>
+  </p>
+
+  <ul class="articles">
+
+    <li>
+      <div class="article-date">
+        <span class="i18n-en">April 2026</span>
+        <span class="i18n-fr">Avril 2026</span>
+      </div>
+      <div class="article-title">
+        <a href="./the-ultimate-medium.html">
+          <span class="i18n-en">The Ultimate Medium</span>
+          <span class="i18n-fr">Le m&eacute;dium ultime</span>
+        </a>
+      </div>
+      <p class="article-desc">
+        <span class="i18n-en">A traversable machine where humans control the computer all the way down. After Ivan Sutherland&rsquo;s Ultimate Display (1965).</span>
+        <span class="i18n-fr">Une machine traversable o&ugrave; l&rsquo;humain contr&ocirc;le l&rsquo;ordinateur jusqu&rsquo;en bas. D&rsquo;apr&egrave;s Ivan Sutherland, The Ultimate Display (1965).</span>
+      </p>
+    </li>
+
+    <li>
+      <div class="article-date">
+        <span class="i18n-en">April 2026</span>
+        <span class="i18n-fr">Avril 2026</span>
+      </div>
+      <div class="article-title">
+        <a href="./enquete-parlementaire.html">
+          <span class="i18n-en">Twelve minutes to dissect a bill</span>
+          <span class="i18n-fr">Douze minutes pour d&eacute;cortiquer une proposition de loi</span>
+        </a>
+      </div>
+      <p class="article-desc">
+        <span class="i18n-en">How Auto-UIflex and hyperskills enable dissecting a bill in twelve minutes, connecting an AI agent to open parliamentary data.</span>
+        <span class="i18n-fr">Comment Auto-UIflex et les hyperskills permettent de d&eacute;cortiquer une proposition de loi en douze minutes, en connectant un agent IA aux donn&eacute;es parlementaires ouvertes.</span>
+      </p>
+    </li>
+
+    <li>
+      <div class="article-date">
+        <span class="i18n-en">April 2026</span>
+        <span class="i18n-fr">Avril 2026</span>
+      </div>
+      <div class="article-title">
+        <a href="./hyperskills-as-commons.html">
+          <span class="i18n-en">Skills as Digital Commons</span>
+          <span class="i18n-fr">Les recettes (skills) comme communs num&eacute;riques</span>
+        </a>
+      </div>
+      <p class="article-desc">
+        <span class="i18n-en">Analysis of the HyperSkills format: URLs that carry complete, portable, ownerless skills. How hyperskills become digital commons.</span>
+        <span class="i18n-fr">Analyse du format HyperSkills&nbsp;: des URLs qui transportent des recettes (skills) compl&egrave;tes, portables et sans propri&eacute;taire. Comment les hyperskills deviennent des communs num&eacute;riques.</span>
+      </p>
+    </li>
+
+  </ul>
+</main>
+
+<footer>
+  <span class="i18n-en">CC BY-SA 4.0 &mdash; Copyright CERI SAS &mdash; <a href="https://hyperskills.net">hyperskills.net</a> &mdash; <a href="https://blog.hyperskills.net">Blog</a></span>
+  <span class="i18n-fr">CC BY-SA 4.0 &mdash; Copyright CERI SAS &mdash; <a href="https://hyperskills.net">hyperskills.net</a> &mdash; <a href="https://blog.hyperskills.net">Blog</a></span>
+</footer>
+
+<script>
+function switchLang(lang) {
+  document.documentElement.lang = lang;
+  document.getElementById('btn-en').className = lang === 'en' ? 'active' : '';
+  document.getElementById('btn-fr').className = lang === 'fr' ? 'active' : '';
+  try { localStorage.setItem('blog-lang', lang); } catch(e) {}
+}
+(function() {
+  try {
+    var saved = localStorage.getItem('blog-lang');
+    if (saved === 'fr') switchLang('fr');
+  } catch(e) {}
+})();
+</script>
+
+</body>
+</html>

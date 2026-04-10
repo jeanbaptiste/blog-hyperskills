@@ -1,0 +1,117 @@
+name: Check & Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check HTML files
+        run: |
+          ERRORS=0
+
+          for f in $(find . -name '*.html' -not -path './.github/*'); do
+            echo "=== Checking $f ==="
+
+            # DOCTYPE
+            if ! head -1 "$f" | grep -qi 'doctype'; then
+              echo "  FAIL: missing <!DOCTYPE html>"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            # meta description
+            if ! grep -qi 'name="description"' "$f"; then
+              echo "  FAIL: missing <meta name=\"description\">"
+              ERRORS=$((ERRORS + 1))
+            else
+              DESC_LEN=$(grep -oi 'name="description"[^>]*content="[^"]*"' "$f" | head -1 | sed 's/.*content="//;s/"//' | wc -c)
+              if [ "$DESC_LEN" -lt 100 ]; then
+                echo "  WARN: meta description too short ($DESC_LEN chars, target 120+)"
+              fi
+            fi
+
+            # canonical
+            if ! grep -qi 'rel="canonical"' "$f"; then
+              echo "  FAIL: missing <link rel=\"canonical\">"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            # Open Graph
+            if ! grep -qi 'property="og:title"' "$f"; then
+              echo "  FAIL: missing og:title"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            # viewport
+            if ! grep -qi 'name="viewport"' "$f"; then
+              echo "  FAIL: missing viewport"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            # robots
+            if ! grep -qi 'name="robots"' "$f"; then
+              echo "  FAIL: missing robots"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            # html lang
+            if ! grep -qi '<html[^>]*lang=' "$f"; then
+              echo "  FAIL: missing <html lang=>"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            # EN/FR toggle — check for i18n mechanism
+            if ! grep -qi 'i18n\|lang-content\|data-lang\|setLang\|switchLang\|lang="en"\|lang="fr"' "$f"; then
+              echo "  WARN: no EN/FR toggle detected"
+            fi
+
+            # Dark mode default — should NOT auto-detect prefers-color-scheme
+            if grep -qi 'prefers-color-scheme.*dark.*?.*dark' "$f"; then
+              echo "  FAIL: dark mode auto-detects system preference (should default to light)"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            # Footer copyright
+            if ! grep -qi 'CC BY-SA' "$f"; then
+              echo "  WARN: no CC BY-SA in footer"
+            fi
+
+            echo "  OK (checks passed for $f)"
+          done
+
+          echo ""
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "TOTAL ERRORS: $ERRORS"
+            exit 1
+          else
+            echo "All checks passed."
+          fi
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

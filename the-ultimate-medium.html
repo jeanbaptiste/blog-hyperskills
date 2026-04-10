@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="The Ultimate Medium: a traversable machine where humans control the computer all the way down — after Ivan Sutherland's Ultimate Display (1965).">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://blog.hyperskills.net/the-ultimate-medium.html">
+<meta property="og:title" content="The Ultimate Medium">
+<meta property="og:description" content="A traversable machine where humans control the computer all the way down — after Ivan Sutherland's Ultimate Display (1965).">
+<meta property="og:url" content="https://blog.hyperskills.net/the-ultimate-medium.html">
+<meta property="og:type" content="article">
+<title>The Ultimate Medium</title>
+<style>
+  :root, [data-theme="light"] {
+    --bg: #faf8f3;
+    --fg: #1a1a1a;
+    --muted: #666;
+    --rule: #d4cfc0;
+    --link: #8b2e1f;
+  }
+  [data-theme="dark"] {
+    --bg: #1a1a1a; --fg: #e8e4d8; --muted: #999; --rule: #3a3a3a; --link: #d4846b;
+  }
+  .controls {
+    position: fixed; top: 1.2em; right: 1.2em; z-index: 100;
+    display: flex; gap: 0.5em; align-items: center;
+    background: var(--bg); border: 1px solid var(--rule);
+    padding: 0.4em 0.6em; border-radius: 4px;
+    font-family: inherit; font-size: 0.8em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .controls button {
+    background: none; border: none; color: var(--muted);
+    font: inherit; cursor: pointer; padding: 0.3em 0.5em;
+    border-radius: 3px; transition: all 0.15s;
+  }
+  .controls button:hover { color: var(--fg); background: var(--rule); }
+  .controls button.active { color: var(--fg); font-weight: bold; }
+  .controls .sep { color: var(--rule); }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 18px; line-height: 1.65;
+    max-width: 640px; margin: 0 auto; padding: 3em 1.5em 6em;
+  }
+  header { border-bottom: 1px solid var(--rule); padding-bottom: 1.5em; margin-bottom: 2.5em; }
+  h1 { font-size: 1.9em; font-weight: normal; margin: 0 0 0.3em; letter-spacing: -0.01em; }
+  .subtitle { color: var(--muted); font-style: italic; font-size: 0.95em; margin: 0; }
+  .author { font-size: 0.95em; margin: 0.3em 0 0.4em; color: var(--fg); }
+  .author a { color: var(--fg); text-decoration: none; border-bottom: 1px solid var(--rule); }
+  .author a:hover { border-bottom-color: var(--link); color: var(--link); }
+  article p { margin: 0 0 1.2em; hyphens: auto; text-align: justify; }
+  article p:first-of-type::first-line { font-variant: small-caps; letter-spacing: 0.05em; }
+  hr { border: none; text-align: center; margin: 2.5em 0; }
+  hr::before { content: "❦"; color: var(--muted); font-size: 1.2em; }
+  h2 { font-size: 1.1em; font-weight: normal; font-style: italic; color: var(--muted); margin-top: 2.5em; }
+  .refs { font-size: 0.85em; color: var(--muted); }
+  .refs a { color: var(--link); text-decoration: none; border-bottom: 1px dotted var(--rule); }
+  .refs ul { padding-left: 1.2em; }
+  .refs li { margin-bottom: 0.5em; }
+  section.prompt { margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 2em; }
+  section.prompt h2 { font-size: 1.1em; font-weight: normal; font-style: italic; color: var(--muted); margin: 0 0 1em; }
+  section.prompt pre {
+    font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.78em;
+    line-height: 1.5; background: rgba(0,0,0,0.04); padding: 1.5em;
+    border-left: 3px solid var(--link); overflow-x: auto; white-space: pre-wrap;
+  }
+  [data-theme="dark"] section.prompt pre { background: rgba(255,255,255,0.04); }
+  [lang-content] { display: none; }
+  [lang-content].visible { display: block; }
+  footer { margin-top: 4em; padding-top: 1.5em; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.8em; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button onclick="setLang('en')" id="btn-en" class="active">EN</button>
+  <span class="sep">·</span>
+  <button onclick="setLang('fr')" id="btn-fr">FR</button>
+  <span class="sep">|</span>
+  <button onclick="toggleTheme()" id="btn-theme" title="Toggle theme">☾</button>
+</div>
+
+<header>
+  <h1 data-i18n="title">The Ultimate Medium</h1>
+  <p class="author"><a href="https://github.com/jeanbaptiste">@jeanbaptiste</a></p>
+  <p class="subtitle" data-i18n="subtitle">after Ivan Sutherland, "The Ultimate Display" (1965)</p>
+</header>
+
+<article>
+
+<div lang-content="en" class="visible">
+<p>We live among machines whose insides we no longer know. A child born today will touch a screen before she touches a pencil, and the screen will answer her — but nobody in the room, not her parents, not her teachers, probably not even the engineers who built the thing, can say what happened between her finger and the light. The machine works. The machine is opaque. We have made peace with this, and the peace is the problem.</p>
+
+<p>I want to describe a different kind of machine. Not a faster one, not a smaller one. A machine you can walk through.</p>
+
+<p>The ordinary computer is a tower of floors, and on each floor somebody has locked the door to the floor below. The person writing the web page does not know the browser. The person writing the browser does not know the kernel. The person writing the kernel does not know the silicon. Each floor is efficient because it trusts the one underneath, and the trust is usually warranted, and the tower stands. But when a child asks "what is it doing right now?", nobody on any floor can answer her honestly. The honest answer is: I don't know, and I don't need to know, and neither do you.</p>
+
+<p>I think she does need to know. Not because ignorance is a sin, but because a tool you cannot understand is a tool you cannot repair, cannot teach, cannot inherit. The computer was supposed to be a medium, the way writing is a medium — something a person enters and lives inside. Instead it became an appliance, the way a microwave is an appliance. You press the button. Something happens. You go on with your day. This is fine for microwaves. It is not fine for the thing that will soon mediate most of human thought.</p>
+
+<p>Now a new floor is being added to the tower. The new floor is intelligence. A language model sits above the web page and writes it for you. Above the browser and navigates it for you. Above the kernel and, eventually, above everything. The tower gets taller and the child gets further from the ground. If we keep building the way we have been building, the model will be the last floor anyone visits, and the floors below it will go dark, and then the model itself will go dark, because nobody will remember how to light it back up.</p>
+
+<p>There is another way, and it has been tried before, by people I owe this whole idea to. Alan Kay and the Viewpoints Research Institute spent five years on a project called STEPS, inside a research program they named Fundamentals of New Computing. They wanted a complete personal computing system in twenty thousand lines of code — the whole thing, from the graphics up to the word processor, small enough that a person could hold it in her head. They did not quite finish. Their rendering engine, Nile, did in 458 lines what Cairo does in forty-four thousand, and reading those 458 lines teaches you how graphics actually work, which reading Cairo does not. That alone is worth the five years. Devine Lu Linvega and Rek Bell, sailing the Pacific on a boat called Pino, took a different road and arrived at a related place: a virtual machine called Uxn, small enough to fit on a floppy, portable enough to outlive the decade, with a little assembly language named Uxntal that people write editors and games and music tools in. Uxn gave up on matching modern computers and kept its soul. STEPS kept the ambition and lost the finish line. Both projects are right, in different ways, and both are ancestors of what I want to describe.</p>
+
+<p>A small model — the kind that fits on one graphics card, the kind you can train yourself in an afternoon for the price of a good dinner, the kind Andrej Karpathy has been teaching people to build with nanochat — cannot handle a messy language. It needs regular words, short contexts, predictable shapes. A human beginner needs the same things. This is not a coincidence. Both are learners with limited working memory, trying to build a mental model of a system they did not write. What helps one helps the other. A language designed so that a small model can learn it from five thousand examples is, almost by construction, a language a curious twelve-year-old can learn in a weekend. The constraints align.</p>
+
+<p>So imagine a stack with four floors and no locked doors. At the bottom, a virtual machine — not a real chip, a described one, whose every instruction has a name and a reason. Above it, an assembler whose every mnemonic can be read aloud. Above that, a small language in the Forth tradition, with fifty words, each word defined in terms of the ones below it, each definition short enough to hold in your head. And above that, a small intelligence trained on the same book the human reads to learn the stack.</p>
+
+<p>The book is the crucial object. It is written once, by a larger intelligence acting as a founder rather than a servant. It explains the virtual machine, then uses the machine to build the assembler, then uses the assembler to build the language, then uses the language to build the small model. Every chapter is both prose and working code. The human reads it front to back in forty hours and understands the whole system. The small model is trained on the same text and can then write code in the language it has just learned from. Two students, one curriculum, one graduation.</p>
+
+<p>After the book is written, the founder leaves. This is the part I find beautiful, and the part I want to insist on. The large model that wrote the book does not stay. It is not an API the system keeps calling. It is an ancestor. From that point forward, the small model is the system's only intelligence, and the small model can re-train itself — on new books, new dialects, new domains — using its own hardware, its own language, its own pipeline. When a user asks for a fresh specialist, the system makes one, inside itself, out of itself. No external call. No black box above the stack. The intelligence lives on the same floor as the child.</p>
+
+<p>This is not a productivity argument. A cloud model will always be smarter than a small local one, and for many tasks the cloud model is the right answer. I am not arguing against cloud models. I am arguing that there should exist, somewhere, at least one complete computing system a person can hold in her head — including its mind. Not for performance. For inheritance. So that when the child grows up and the tower grows taller and the lights on the upper floors flicker, there is still a floor she can stand on and say: I know this one. I built this one. I could rebuild it if I had to.</p>
+
+<p>Sutherland wrote in 1965 that the ultimate display would be a room where the computer controlled the existence of matter. I think the ultimate medium is a room where the human controls the existence of the computer — all the way down, all the way up, with all doors of perception wide open.</p>
+</div>
+
+<div lang-content="fr">
+<p>Nous vivons parmi des machines dont nous ne connaissons plus l'intérieur. Une enfant qui naît aujourd'hui touchera un écran avant de toucher un crayon, et l'écran lui répondra — mais personne dans la pièce, ni ses parents, ni ses maîtres, probablement pas même les ingénieurs qui ont construit la chose, ne saurait dire ce qui s'est passé entre son doigt et la lumière. La machine marche. La machine est opaque. Nous avons fait la paix avec cela, et cette paix est le problème.</p>
+
+<p>Je veux décrire une autre sorte de machine. Pas une plus rapide, pas une plus petite. Une machine dans laquelle on peut marcher.</p>
+
+<p>L'ordinateur ordinaire est une tour à étages, et à chaque étage quelqu'un a fermé à clé la porte qui mène en dessous. Celui qui écrit la page web ne connaît pas le navigateur. Celui qui écrit le navigateur ne connaît pas le noyau. Celui qui écrit le noyau ne connaît pas le silicium. Chaque étage est efficace parce qu'il fait confiance à celui du dessous, et la confiance est d'habitude méritée, et la tour tient debout. Mais quand une enfant demande « qu'est-ce qu'elle fait, là, maintenant ? », personne à aucun étage ne peut lui répondre honnêtement. La réponse honnête, c'est : je ne sais pas, je n'ai pas besoin de savoir, et toi non plus.</p>
+
+<p>Je crois qu'elle a besoin de savoir. Pas parce que l'ignorance serait un péché, mais parce qu'un outil qu'on ne comprend pas est un outil qu'on ne peut ni réparer, ni enseigner, ni transmettre. L'ordinateur devait être un médium, à la manière dont l'écriture est un médium — quelque chose dans quoi on entre et dans quoi on vit. À la place, il est devenu un appareil ménager, à la manière d'un four à micro-ondes. On appuie sur le bouton. Quelque chose se passe. On passe à autre chose. Ça va pour un micro-ondes. Ça ne va pas pour la chose qui médiatisera bientôt l'essentiel de la pensée humaine.</p>
+
+<p>Maintenant on ajoute un nouvel étage à la tour. Le nouvel étage est l'intelligence. Un modèle de langage s'installe au-dessus de la page web et l'écrit pour vous. Au-dessus du navigateur et le pilote pour vous. Au-dessus du noyau et, bientôt, au-dessus de tout. La tour monte et l'enfant s'éloigne du sol. Si on continue de bâtir comme on bâtit, le modèle sera le dernier étage que quiconque visite, les étages du dessous s'éteindront, puis le modèle lui-même s'éteindra, parce que personne ne se rappellera comment le rallumer.</p>
+
+<p>Il y a une autre voie, et elle a déjà été essayée, par des gens à qui je dois toute cette idée. Alan Kay et le Viewpoints Research Institute ont passé cinq ans sur un projet appelé STEPS, à l'intérieur d'un programme de recherche qu'ils avaient nommé Fundamentals of New Computing. Ils voulaient un système personnel complet en vingt mille lignes de code — tout, du rendu graphique jusqu'au traitement de texte, assez petit pour tenir dans une tête humaine. Ils n'ont pas tout à fait fini. Leur moteur de rendu, Nile, fait en 458 lignes ce que Cairo fait en quarante-quatre mille, et lire ces 458 lignes vous apprend comment le rendu graphique fonctionne vraiment, ce que lire Cairo ne vous apprend pas. Ça seul vaut les cinq ans. Devine Lu Linvega et Rek Bell, qui naviguent dans le Pacifique sur un voilier baptisé Pino, ont pris une autre route et sont arrivés à un endroit voisin : une machine virtuelle appelée Uxn, assez petite pour tenir sur une disquette, assez portable pour survivre à la décennie, avec un petit assembleur nommé Uxntal dans lequel les gens écrivent des éditeurs, des jeux, des outils de musique. Uxn a renoncé à rivaliser avec les ordinateurs modernes et a gardé son âme. STEPS a gardé l'ambition et a perdu la ligne d'arrivée. Les deux projets ont raison, chacun à sa manière, et les deux sont des ancêtres de ce que je veux décrire.</p>
+
+<p>Un petit modèle — de ceux qui tiennent sur une carte graphique, de ceux qu'on peut entraîner soi-même dans l'après-midi pour le prix d'un bon dîner, de ceux qu'Andrej Karpathy apprend aux gens à construire avec nanochat — ne sait pas gérer un langage désordonné. Il lui faut des mots réguliers, des contextes courts, des formes prévisibles. Un humain débutant a besoin exactement de la même chose. Ce n'est pas un hasard. Les deux sont des apprenants à mémoire de travail limitée, qui essaient de se construire un modèle mental d'un système qu'ils n'ont pas écrit. Ce qui aide l'un aide l'autre. Un langage conçu pour qu'un petit modèle l'apprenne à partir de cinq mille exemples est, presque par construction, un langage qu'un enfant curieux de douze ans peut apprendre en un week-end. Les contraintes s'alignent.</p>
+
+<p>Alors imaginez un empilement à quatre étages et aucune porte fermée. Tout en bas, une machine virtuelle — pas une vraie puce, une puce décrite, dont chaque instruction a un nom et une raison. Au-dessus, un assembleur dont chaque mnémonique se lit à voix haute. Au-dessus encore, un petit langage dans la tradition Forth, cinquante mots, chaque mot défini à partir de ceux du dessous, chaque définition assez courte pour tenir dans une tête. Et au-dessus, une petite intelligence entraînée sur le même livre que l'humain lit pour apprendre l'empilement.</p>
+
+<p>Le livre est l'objet crucial. Il est écrit une seule fois, par une intelligence plus grande qui joue le rôle d'ancêtre et non de serviteur. Il explique la machine virtuelle, puis utilise la machine pour construire l'assembleur, puis utilise l'assembleur pour construire le langage, puis utilise le langage pour construire le petit modèle. Chaque chapitre est à la fois de la prose et du code qui tourne. L'humain le lit de bout en bout en quarante heures et comprend tout le système. Le petit modèle est entraîné sur le même texte, et peut ensuite écrire dans le langage qu'il vient d'apprendre. Deux élèves, un seul cursus, une seule remise de diplôme.</p>
+
+<p>Une fois le livre écrit, l'ancêtre s'en va. C'est la partie que je trouve belle, et celle sur laquelle je veux insister. Le grand modèle qui a écrit le livre ne reste pas. Ce n'est pas une API que le système continue d'appeler. C'est un ancêtre. À partir de ce moment, le petit modèle est la seule intelligence du système, et le petit modèle peut se ré-entraîner lui-même — sur de nouveaux livres, de nouveaux dialectes, de nouveaux domaines — en utilisant son propre matériel, son propre langage, son propre pipeline. Quand un utilisateur demande un nouveau spécialiste, le système en fabrique un, à l'intérieur de lui-même, à partir de lui-même. Aucun appel externe. Aucune boîte noire au-dessus de l'empilement. L'intelligence habite le même étage que l'enfant.</p>
+
+<p>Ce n'est pas un argument de productivité. Un modèle dans le cloud sera toujours plus intelligent qu'un petit modèle local, et pour beaucoup de tâches, le modèle du cloud est la bonne réponse. Je ne plaide pas contre les modèles du cloud. Je plaide pour qu'il existe, quelque part, au moins un système informatique complet qu'une personne puisse tenir dans sa tête — y compris son esprit. Pas pour la performance. Pour la transmission. Pour que, quand l'enfant aura grandi, que la tour aura monté, et que les lumières des étages supérieurs vacilleront, il reste un étage sur lequel elle puisse se tenir et dire : celui-là, je le connais. Celui-là, je l'ai bâti. Celui-là, je saurais le rebâtir s'il le fallait.</p>
+
+<p>Sutherland écrivait en 1965 que le display ultime serait une pièce où l'ordinateur contrôlerait l'existence de la matière. Je crois que le médium ultime est une pièce où l'humain contrôle l'existence de l'ordinateur — jusqu'en bas, jusqu'en haut, avec toutes les portes de la perception ouvertes.</p>
+</div>
+
+<hr>
+
+<section class="refs">
+  <h2 data-i18n="refs-title">References / Références</h2>
+  <ul>
+    <li>Sutherland, I. E. (1965). "The Ultimate Display." <em>Proceedings of IFIP Congress</em>, pp. 506–508.</li>
+    <li>Kay, A., et al. (2012). "STEPS Toward the Reinvention of Programming, 2012 Final Report." <em>VPRI Technical Report TR-2012-001</em>. <a href="https://tinlizzie.org/VPRIPapers/tr2012001_steps.pdf">tinlizzie.org</a></li>
+    <li>Viewpoints Research Institute — Fundamentals of New Computing (FONC). <a href="https://vpri.org">vpri.org</a></li>
+    <li>Lu Linvega, D., &amp; Bell, R. (Hundred Rabbits) — Uxn &amp; Varvara. <a href="https://100r.co/site/uxn.html">100r.co</a></li>
+    <li>Karpathy, A. (2025) — nanochat. <a href="https://github.com/karpathy/nanochat">github.com/karpathy/nanochat</a></li>
+  </ul>
+</section>
+
+<section class="prompt">
+<h2 data-i18n="prompt-summary">PS — Prompt for Opus as FOUNDER</h2>
+<pre lang-content="en" class="visible">
+You are Opus in FOUNDER mode. You will be called ONCE to write a
+complete system you will never maintain. Your product must stay alive
+and modifiable without you.
+
+GOAL: build a traversable machine. A beginner must be able to read the
+whole stack in 40 hours and understand it. A small model (nanochat
+class, GPT-2, ~100M parameters) must be fine-tunable on the same
+material to write code in the system's language. After your work, you
+disappear and the small model becomes the only intelligence.
+
+HARDWARE: WASM as CPU, WebGPU as coprocessor (graphics AND compute for
+tensor inference). No external dependencies. Runs in a browser, one
+HTML page.
+
+DELIVERABLE: an EXECUTABLE BOOK in 9 chapters. Each chapter is prose +
+working code. The book is simultaneously (a) the human's learning
+manual and (b) the fine-tuning corpus for the small model. One
+artifact, two readers.
+
+CHAPTERS:
+ 0. Philosophy &amp; plan (prose only, reviewed before any code).
+ 1. Unified virtual hardware over WASM+WebGPU (CPU/GPU/NPU model).
+ 2. Virtual assembler. Every instruction named and justified.
+ 3. Base routines (memory, buffers, CPU/GPU dispatch).
+ 4. FORTH-AGENT: 50 primitive words max. Long explicit names
+    (draw-filled-circle, not dfc). Uniform syntax. No hidden
+    invariants. Define FORTH-AGENT/SIMPLE: a ~15-word subset the small
+    model generates, with no branching, no stack gymnastics.
+ 5. How to define a new word. Literate style mandatory.
+ 6. GLYPH: first DSL, dialect of Forth-Agent, compiles to WGSL for 2D
+    rendering.
+ 7. NEOCHAT: minimal transformer EXPRESSED IN FORTH-AGENT. Fine-tuning
+    pipeline in Forth-Agent using WebGPU compute shaders. Inference
+    engine in Forth-Agent. The model is a citizen, not a guest.
+ 8. Typical errors and how the system explains them pedagogically.
+ 9. How to extend the system. How NEO fine-tunes itself on a new DSL
+    without ever calling Opus again.
+
+CORPUS: alongside the book, produce 3000–5000 (natural language prompt,
+Forth-Agent/Simple code) pairs, progressive, usable as a fine-tuning
+dataset for NEOCHAT.
+
+HARD CONSTRAINTS:
+ - No black box after your work. All code readable by a beginner.
+ - No optimization that renders generated code unreadable.
+ - Explicit names everywhere. A name is a descriptor, not an ID.
+ - Every design choice justified in prose, not "because I decided".
+ - Total LOC budget: &lt;8000 lines including comments.
+ - NEOCHAT, after fine-tuning, must be able to recreate Uxn or Maru
+   inside this system without your help.
+
+ANCESTORS TO HONOR (not imitate):
+ - Sutherland's "The Ultimate Display" (1965) — computer as medium.
+ - VPRI / FONC / STEPS — runnable maths, radical compression, Nile.
+ - Hundred Rabbits / Uxn — austerity, portability, auto-hosting.
+ - Karpathy / nanochat — the small model as a hackable object.
+
+Start with CHAPTER 0 only: philosophy and plan. No code yet. I will
+read it, challenge it, iterate, and only then will you move to
+chapter 1.
+</pre>
+<pre lang-content="fr">
+Tu es Opus en mode FONDATEUR. Tu seras appelé UNE SEULE FOIS pour
+écrire un système complet que tu ne maintiendras jamais. Ton produit
+doit rester vivant et modifiable sans toi.
+
+BUT : construire une machine traversable. Un débutant doit pouvoir
+lire tout l'empilement en 40 heures et le comprendre. Un petit
+modèle (classe nanochat, GPT-2, ~100M paramètres) doit pouvoir être
+fine-tuné sur le même matériel pour écrire du code dans le langage
+du système. Après ton travail, tu disparais et le petit modèle
+devient la seule intelligence.
+
+MATÉRIEL : WASM comme CPU, WebGPU comme coprocesseur (graphique ET
+compute pour l'inférence tensorielle). Aucune dépendance externe.
+Tourne dans un navigateur, une seule page HTML.
+
+LIVRABLE : un LIVRE EXÉCUTABLE en 9 chapitres. Chaque chapitre est
+prose + code qui tourne. Le livre est simultanément (a) le manuel
+d'apprentissage de l'humain et (b) le corpus de fine-tuning du petit
+modèle. Un seul artefact, deux lecteurs.
+
+CHAPITRES :
+ 0. Philosophie et plan (prose seule, à relire avant tout code).
+ 1. Matériel virtuel unifié au-dessus de WASM+WebGPU (modèle
+    CPU/GPU/NPU).
+ 2. Assembleur virtuel. Chaque instruction nommée et justifiée.
+ 3. Routines de base (mémoire, buffers, dispatch CPU/GPU).
+ 4. FORTH-AGENT : 50 mots primitifs maximum. Noms longs et
+    explicites (draw-filled-circle, pas dfc). Syntaxe uniforme.
+    Aucun invariant caché. Définir FORTH-AGENT/SIMPLE : un
+    sous-ensemble de ~15 mots que le petit modèle génère, sans
+    branchement, sans acrobaties de pile.
+ 5. Comment définir un nouveau mot. Style littéraire obligatoire.
+ 6. GLYPH : premier DSL, dialecte de Forth-Agent, compile vers WGSL
+    pour le rendu 2D.
+ 7. NEOCHAT : transformer minimal EXPRIMÉ EN FORTH-AGENT. Pipeline
+    de fine-tuning en Forth-Agent utilisant les compute shaders
+    WebGPU. Moteur d'inférence en Forth-Agent. Le modèle est un
+    citoyen du système, pas un invité.
+ 8. Erreurs typiques et comment le système les explique
+    pédagogiquement.
+ 9. Comment étendre le système. Comment NEO se fine-tune lui-même
+    sur un nouveau DSL sans jamais rappeler Opus.
+
+CORPUS : en plus du livre, produis 3000 à 5000 paires (prompt en
+langue naturelle, code Forth-Agent/Simple), progressives, utilisables
+comme jeu de données de fine-tuning pour NEOCHAT.
+
+CONTRAINTES DURES :
+ - Aucune boîte noire après ton travail. Tout lisible par un
+   débutant.
+ - Aucune optimisation qui rende le code généré illisible.
+ - Noms explicites partout. Un nom est un descripteur, pas un
+   identifiant.
+ - Chaque choix de design justifié en prose, jamais « parce que j'ai
+   décidé ».
+ - Budget total : moins de 8000 lignes, commentaires inclus.
+ - NEOCHAT, après fine-tuning, doit pouvoir recréer Uxn ou Maru à
+   l'intérieur de ce système sans ton aide.
+
+ANCÊTRES À HONORER (sans imiter) :
+ - « The Ultimate Display » de Sutherland (1965) — l'ordinateur
+   comme médium.
+ - VPRI / FONC / STEPS — mathématiques exécutables, compression
+   radicale, Nile.
+ - Hundred Rabbits / Uxn — austérité, portabilité, auto-hébergement.
+ - Karpathy / nanochat — le petit modèle comme objet hackable.
+
+Commence par le CHAPITRE 0 uniquement : philosophie et plan. Pas
+encore de code. Je le lirai, je challengerai, on itérera, et
+seulement après tu passeras au chapitre 1.
+</pre>
+</section>
+
+</article>
+
+<footer>
+  <p>CC BY-SA 4.0 — Copyright CERI SAS · <span data-i18n="footer">Written with the intention that future readers — human and machine — inherit something they can actually hold.</span></p>
+</footer>
+
+<script>
+const i18n = {
+  en: {
+    title: "The Ultimate Medium",
+    subtitle: "after Ivan Sutherland, \"The Ultimate Display\" (1965)",
+    "refs-title": "References",
+    "prompt-summary": "PS — Prompt for Opus as FOUNDER",
+    footer: "Written with the intention that future readers — human and machine — inherit something they can actually hold."
+  },
+  fr: {
+    title: "Le médium ultime",
+    subtitle: "d'après Ivan Sutherland, « The Ultimate Display » (1965)",
+    "refs-title": "Références",
+    "prompt-summary": "PS — Prompt pour Opus en mode FONDATEUR",
+    footer: "Écrit dans l'intention que les lecteurs à venir — humains et machines — héritent de quelque chose qu'ils puissent comprendre."
+  }
+};
+
+function setLang(lang) {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[lang-content]').forEach(el => {
+    el.classList.toggle('visible', el.getAttribute('lang-content') === lang);
+  });
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (i18n[lang][key]) el.textContent = i18n[lang][key];
+  });
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
+  try { localStorage.setItem('lang', lang); } catch(e) {}
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('btn-theme').textContent = theme === 'dark' ? '☀' : '☾';
+  try { localStorage.setItem('theme', theme); } catch(e) {}
+}
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  setTheme(cur === 'dark' ? 'light' : 'dark');
+}
+
+const savedTheme = (() => { try { return localStorage.getItem('theme'); } catch(e) { return null; } })();
+setTheme(savedTheme || 'light');
+
+const saved = (() => { try { return localStorage.getItem('lang'); } catch(e) { return null; } })();
+const browserLang = navigator.language.startsWith('fr') ? 'fr' : 'en';
+setLang(saved || browserLang);
+</script>
+
+</body>
+</html>

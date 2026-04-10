@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HyperSkills — Skills as Digital Commons</title>
+<link rel="stylesheet" href="./fonts.css">
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --accent: #c8401a;
+    --accent2: #1a5fc8;
+    --muted: #6b6560;
+    --border: #d4cfc7;
+    --code-bg: #1a1814;
+    --code-text: #e8e0d0;
+    --highlight: #fff0a0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── I18N ── */
+  body.lang-fr [lang="en"] { display: none !important; }
+  body.lang-en [lang="fr"] { display: none !important; }
+
+  .examples-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin: 2rem 0;
+  }
+
+  .lang-switcher {
+    display: flex;
+    gap: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+  }
+
+  .lang-btn {
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    background: none;
+    cursor: pointer;
+    color: var(--muted);
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .lang-btn:first-child { border-right: none; border-radius: 2px 0 0 2px; }
+  .lang-btn:last-child  { border-radius: 0 2px 2px 0; }
+  .lang-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 3px double var(--border);
+    padding: 2rem 0 0;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .publication-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 420px;
+  }
+
+  .hero-text {
+    padding: 3rem 4rem;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .category-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .category-tag::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 4vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .standfirst {
+    font-size: 1.1rem;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 480px;
+    border-left: 3px solid var(--accent);
+    padding-left: 1.2rem;
+    margin-top: 1rem;
+  }
+
+  .hero-visual {
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255,255,255,0.02) 2px,rgba(255,255,255,0.02) 4px);
+  }
+
+  .terminal-window {
+    background: #1a1814;
+    border: 1px solid #333;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    position: relative;
+    z-index: 1;
+  }
+
+  .terminal-bar {
+    background: #2a2520;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #333;
+  }
+
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: #ff5f56; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #27c93f; }
+
+  .terminal-title { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: #666; margin-left: auto; }
+
+  .terminal-body { padding: 1.2rem; font-family: 'DM Mono', monospace; font-size: 0.72rem; line-height: 1.8; }
+
+  .t-prompt { color: #27c93f; }
+  .t-cmd    { color: #e8e0d0; }
+  .t-out    { color: #8a8070; }
+  .t-hl     { color: #c8401a; }
+  .t-blue   { color: #6eb4f7; }
+  .t-yellow { color: #ffbd2e; }
+  .t-green  { color: #a8d8a8; }
+  .cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: #27c93f;
+    vertical-align: middle;
+    animation: blink 1.2s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .byline-bar {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem 4rem;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.02);
+  }
+
+  .author       { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+  .reading-time { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-left: auto; }
+
+  /* ── LAYOUT ── */
+  .article-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 4rem;
+    padding: 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── PROSE ── */
+  .prose h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    margin: 3rem 0 1rem;
+    line-height: 1.2;
+    position: relative;
+  }
+
+  .prose h2::before {
+    content: '§';
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    position: absolute;
+    left: -2rem;
+    top: 0.4rem;
+  }
+
+  .prose h3 {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 2.5rem 0 0.8rem;
+  }
+
+  .prose p   { margin-bottom: 1.4rem; color: #1a1714; }
+  .prose a   { color: var(--accent2); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .prose strong { font-weight: 600; }
+
+  /* ── PULLQUOTE ── */
+  .pullquote {
+    border-top: 3px solid var(--ink);
+    border-bottom: 1px solid var(--border);
+    margin: 2.5rem 0;
+    padding: 1.5rem 0 1.2rem;
+  }
+
+  .pullquote p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .pullquote p em { font-style: italic; color: var(--accent); }
+
+  /* ── TABLE ── */
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    font-size: 0.85rem;
+  }
+
+  .comparison-table th {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.7rem 1rem;
+    text-align: left;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .comparison-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .comparison-table tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+  .comparison-table tr.hl td { background: #fef5f2; }
+  .comparison-table tr.hl td:first-child { border-left: 3px solid var(--accent); padding-left: calc(1rem - 3px); }
+
+  /* ── TAGS ── */
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin: 2px;
+  }
+
+  .tag-green  { background: #d4edda; color: #155724; }
+  .tag-orange { background: #fff3cd; color: #856404; }
+  .tag-red    { background: #f8d7da; color: #721c24; }
+  .tag-blue   { background: #d1ecf1; color: #0c5460; }
+  .tag-purple { background: #ede7f6; color: #4527a0; }
+
+  /* ── CODE ── */
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 1.4rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    border-left: 3px solid var(--accent);
+  }
+
+  .kw   { color: #c8401a; }
+  .str  { color: #a8d8a8; }
+  .cm   { color: #555; font-style: italic; }
+  .fn   { color: #6eb4f7; }
+  .num  { color: #ffbd2e; }
+  .prop { color: #a8d8a8; }
+
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85em;
+    background: rgba(0,0,0,0.06);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar { position: relative; }
+
+  .sidebar-section {
+    border: 1px solid var(--border);
+    padding: 1.4rem;
+    margin-bottom: 1.5rem;
+    background: white;
+  }
+
+  .sidebar-section h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-section ul { list-style: none; font-size: 0.85rem; }
+
+  .sidebar-section li {
+    padding: 0.3rem 0;
+    border-bottom: 1px dashed var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sidebar-section li:last-child { border-bottom: none; }
+
+  .sidebar-section li a {
+    color: var(--accent2);
+    text-decoration: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+  }
+
+  .sidebar-section li a:hover { text-decoration: underline; }
+
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .live  { background: #27c93f; }
+  .beta  { background: #ffbd2e; }
+  .draft { background: #8a8070; }
+
+  .layer-diagram {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 1rem;
+    line-height: 1.9;
+  }
+
+  .layer-diagram .arrow { color: #c8401a; }
+  .layer-diagram .label { color: #6eb4f7; }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: var(--highlight);
+    border: 1px solid #d4c040;
+    padding: 1.2rem 1.4rem;
+    margin: 2rem 0;
+    font-size: 0.9rem;
+  }
+
+  .info-box strong {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #5a4800;
+  }
+
+  /* ── FORMAT BOX ── */
+  .format-box { border: 1px solid var(--border); background: white; margin: 2rem 0; }
+
+  .format-box-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.6rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .format-box-body {
+    padding: 1.2rem 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+
+  .format-field { border-left: 2px solid var(--border); padding-left: 0.8rem; }
+
+  .format-field-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+
+  .format-field-val { font-size: 0.82rem; color: #1a1714; line-height: 1.4; }
+
+  /* ── URL DEMO ── */
+  .url-demo {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 1rem 1.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    line-height: 1.7;
+    word-break: break-all;
+    margin: 1.5rem 0;
+    border-left: 3px solid var(--accent2);
+    border-radius: 4px;
+  }
+
+  .url-demo .u-base  { color: #c8c6d0; }
+  .url-demo .u-key   { color: #c8401a; }
+  .url-demo .u-val   { color: #6eb4f7; }
+  .url-demo .u-label { color: #8a8070; font-style: italic; }
+  .url-demo a        { color: inherit; text-decoration: none; }
+  .url-demo a:hover  { text-decoration: underline; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 3px double var(--border);
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    background: rgba(0,0,0,0.02);
+  }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 3rem 0;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+  }
+
+  .section-divider::before, .section-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    .article-grid { grid-template-columns: 1fr; }
+    .header-top, .byline-bar, .article-grid, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .hero-text { padding: 2rem 1.5rem; }
+    .prose h2::before { display: none; }
+    .format-box-body { grid-template-columns: 1fr; }
+  }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-text       { animation: fadeUp 0.6s ease forwards; }
+  .terminal-window { animation: fadeUp 0.6s 0.2s ease both; }
+</style>
+</head>
+<body class="lang-en">
+
+<header>
+  <div class="header-top">
+    <span class="publication-name">
+      <span lang="en">Web & AI — Open formats</span>
+      <span lang="fr">Web & IA — Formats ouverts</span>
+    </span>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('fr')">FR</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-text">
+      <div class="category-tag">
+        <span lang="en">Analysis · hyperskills.net</span>
+        <span lang="fr">Analyse · hyperskills.net</span>
+      </div>
+      <h1>
+        <span lang="en">Skills as <em>digital commons</em></span>
+        <span lang="fr">Les recettes (skills) comme <em>communs numériques</em></span>
+      </h1>
+      <p class="standfirst" lang="en">A hyperskill is a URL that contains a complete, portable skill. Not a link to a skill stored on a server somewhere — the skill itself, encoded in the URL. Any knowledge artifact — SQL recipe, Markdown guide, agent workflow, UI composition — becomes shareable, versionable, and ownerless.</p>
+      <p class="standfirst" lang="fr">Une hyper-recette (hyperskill) est une URL qui contient une recette (skill) complète et portable. Pas un lien vers une recette (skill) stockée sur un serveur — la recette (skill) elle-même, encodée dans l'URL. N'importe quel artefact de connaissance — recette SQL, guide Markdown, workflow agent, composition UI — devient partageable, versionnable et sans propriétaire.</p>
+    </div>
+    <div class="hero-visual">
+      <div class="terminal-window">
+        <div class="terminal-bar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="terminal-title">hyperskill · viewer</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-out">── url ───────────────────────────</span></div>
+          <div><span class="t-blue">tricoteuses.fr/recettes/</span></div>
+          <div><span class="t-blue">analyser_amendements</span></div>
+          <div><span class="t-hl">?hs=</span><span class="t-green">LS0tCnRpdGxlO…</span></div>
+          <br>
+          <div><span class="t-out">── meta ──────────────────────────</span></div>
+          <div><span class="t-yellow">title:</span> <span class="t-cmd">Analyser les amendements</span></div>
+          <div><span class="t-yellow">desc: </span> <span class="t-cmd">Recettes SQL sur assemblee.*</span></div>
+          <div><span class="t-yellow">tags: </span> <span class="t-cmd">sql · jsonb · assemblée</span></div>
+          <div><span class="t-yellow">hash: </span><span class="t-hl">a3f7c2d9…</span> <span class="t-out">← SHA-256</span></div>
+          <div><span class="t-yellow">prev: </span><span class="t-out">9b1e44f1…</span></div>
+          <br>
+          <div><span class="t-out">── content (decoded) ─────────────</span></div>
+          <div><span class="t-out">La base `canutes` expose les</span></div>
+          <div><span class="t-out">schémas assemblee, legifrance,</span></div>
+          <div><span class="t-out">senat. Cette recette cible</span></div>
+          <div><span class="t-out">`assemblee.amendements`.</span></div>
+          <br>
+          <div><span class="t-out">## 1. Amendements d'un député</span></div>
+          <div><span class="t-green">SELECT</span> <span class="t-cmd">a.uid, a.texte_loi_uid,</span></div>
+          <div><span class="t-cmd">  a.legislature,</span></div>
+          <div><span class="t-green">FROM</span> <span class="t-cmd">assemblee.deputes_sig dsa</span></div>
+          <div><span class="t-green">JOIN</span> <span class="t-cmd">assemblee.amendements a</span></div>
+          <div><span class="t-cmd">  ON a.uid = dsa.amendement_uid</span></div>
+          <div><span class="t-green">WHERE</span> <span class="t-cmd">dsa.depute_uid =</span> <span class="t-hl">'PA722142'</span></div>
+          <div><span class="t-green">ORDER BY</span> <span class="t-cmd">date_depot DESC;</span></div>
+          <br>
+          <div><span class="t-out">## 2. Fallback JSONB …</span></div>
+          <div><span class="t-out">## 3. Filtrer par texte …</span></div>
+          <div><span class="t-out">## 4. Relier au dossier …</span></div>
+          <br>
+          <div><span class="t-prompt">✓</span> <span class="t-cmd">4 895 b · 6 528 chars b64</span> <span class="cursor"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="byline-bar">
+    <span class="author">
+      <span lang="en">Analysis — Web & AI · <a href="https://hyperskills.net" style="color:var(--accent2);text-decoration:none">hyperskills.net</a></span>
+      <span lang="fr">Analyse — Web & IA · <a href="https://hyperskills.net" style="color:var(--accent2);text-decoration:none">hyperskills.net</a></span>
+    </span>
+    <span class="reading-time">
+      <span lang="en">≈ 14 min read</span>
+      <span lang="fr">≈ 14 min de lecture</span>
+    </span>
+  </div>
+</header>
+
+<div class="article-grid">
+  <main class="prose">
+
+    <!-- ═══════════════════════════════════════════════════ SECTION I -->
+    <div lang="en">
+      <p>The dominant model for sharing knowledge with AI agents is broken by design. You write a prompt, a workflow, a data recipe, or a system instruction. You store it on a platform — a SaaS tool, a chat interface, a note-taking app. It lives there, locked to your account, invisible to others, and gone the moment the platform changes its terms or shuts down.</p>
+
+      <p>The problem is not that knowledge is being created. The problem is that it cannot <em>circulate</em>. Every practitioner rediscovers the same patterns from scratch. Every team re-invents the same agent workflows. Every organisation accumulates knowledge in silos that evaporate when people leave or platforms pivot.</p>
+
+      <p><strong>HyperSkills</strong> — the format defined at <a href="https://hyperskills.net" target="_blank">hyperskills.net</a> — is a minimal, radical answer to this problem. A hyperskill is a URL that <em>contains</em> the skill, not a link to a skill stored elsewhere. The knowledge artifact is encoded directly in the URL parameter <code>?hs=</code>. It requires no server to host, no account to access, and no platform permission to share.</p>
+    </div>
+
+    <div lang="fr">
+      <p>Le modèle dominant pour partager des connaissances avec des agents IA est cassé par conception. On écrit un prompt, un workflow, une recette de données, une instruction système. On le stocke sur une plateforme — un outil SaaS, une interface de chat, une appli de notes. Ça vit là, verrouillé à un compte, invisible pour les autres, et disparu dès que la plateforme change ses conditions ou ferme.</p>
+
+      <p>Le problème n'est pas que la connaissance est créée. Le problème est qu'elle ne peut pas <em>circuler</em>. Chaque praticien redécouvre les mêmes patterns depuis zéro. Chaque équipe réinvente les mêmes workflows agents. Chaque organisation accumule de la connaissance dans des silos qui s'évaporent quand les gens partent ou que les plateformes pivotent.</p>
+
+      <p><strong>HyperSkills</strong> — le format défini sur <a href="https://hyperskills.net" target="_blank">hyperskills.net</a> — est une réponse minimale et radicale à ce problème. Une hyper-recette (hyperskill) est une URL qui <em>contient</em> la recette (skill), pas un lien vers une recette (skill) stockée ailleurs. L'artefact de connaissance est encodé directement dans le paramètre d'URL <code>?hs=</code>. Pas de serveur pour héberger, pas de compte pour accéder, pas de permission de plateforme pour partager.</p>
+    </div>
+
+    <div class="section-divider">I</div>
+
+    <!-- ═══ WHAT IS A HYPERSKILL -->
+    <h2>
+      <span lang="en">What is a hyperskill</span>
+      <span lang="fr">Qu'est-ce qu'une hyper-recette (hyperskill)</span>
+    </h2>
+
+    <div lang="en">
+      <p>The concept is deliberately simple. A hyperskill is a URL with a <code>?hs=</code> parameter containing the base64-encoded content of a skill. The content is free-form — Markdown, SQL, YAML, HTML, plain text, or any structured format. The URL's origin (the domain and path before the <code>?hs=</code>) identifies the context where the skill was created and is meant to be used.</p>
+    </div>
+
+    <div lang="fr">
+      <p>Le concept est délibérément simple. Une hyper-recette (hyperskill) est une URL avec un paramètre <code>?hs=</code> contenant le contenu d'une recette (skill) encodé en base64. Le contenu est libre — Markdown, SQL, YAML, HTML, texte brut, ou n'importe quel format structuré. L'origine de l'URL (le domaine et le chemin avant <code>?hs=</code>) identifie le contexte dans lequel la recette (skill) a été créée et est destinée à être utilisée.</p>
+    </div>
+
+    <div class="url-demo">
+      <a href="https://tricoteuses.fr/recettes/analyser_amendements?hs=gz.H4sIAAAAAAACA+1Xy3IaRxTdz1f0DjuFsURkq0qKlcICJXZhIICSyopqZhrcSdM96odK+pvsEr6DH8u9txlmRkaxZKtSWWQh1I+5z3NfPRH2WgTLPpyPWPBSSbdZn7CP3ufu5OXLVZq3UpOJI/xpiYAHSXJutBc6sEwwxZkVqfBewDH+K7ZMOM+kzsTNZi1YzkGCCUpqERzceZaL4JkD4dIin9xI7XGRbdbwMdwbUOraOCZucmUs99JoxyY/9ZtsepsLJzTwMYG51MrcO8aXQnvXSpI+Z3MOd0HLqyBYynXwgtgYOFWwdOnHzXrFgcY5sZorIZpwvpQLy3VKygF37lusblAq4dMqjdDMW37NpVIclZfwpRcr0IM5UH73ZYvDWUYXjp0kSdDkEC/BWlBnIZW3qKFDHi43mgRlHOzF+9QoozUswDXa2BUnjGD/zIsbL2bKyFmQWbTBKe6DFc+bCVkql2AIlzZS58Fv1i4Kcahm1kBdPCd5gv2GIAA1rHN02qxCP6sY0UykYrohbqTzaArqueVihSKotFCKwMwk4Y9oekNIKLIpsgZhrsmA24JDOGRGp3C1mkOY2FIbAOT9ZDh4C7CAJ4CezYWDy1Zy2GJjkX4UFv+IcdXVaN3ObIyLBd/8iQw4y1VwzJp5IANQOVVzEWHRiPmAnPnjnQSh2KkqAzmDhiJnsBVTLrdSpzLnKpn0+r3zacIYbyGStKiDS0cVgONBBnJfnDVkBiLkQqbk+saLs7OGDithTd/oZYN1JixugZte1ijT21SJrvhZCqKCU9jlxhMR7mYZbu+naQjPfVe4qeUyxr4rTomjknOMBOLnjK1zoqQHT1xYvkTSKZqM5Jm8lq4wBTOFJEZHw/E5AOYjz+1lcjEefqhk3GewYZnjyfvhu8E9ScrZcBCxYG/w28olopH88mNv3KOLKGgWv2yMOsft9uFRuwFWdgbdSBrBfgO1IohkOO72xuztrw+BoNubnJ/WgugqNCCEOOU1hGmziCTIGQgmtyeOSg2eKGIqHkWkIu+IU4rLsVhEYOiijN3HBdx/Ds+vwy2WOywsKy4d01CENmtoXN7tTf3/QXqypFtw5b4k69otdsGVmvP096L5bJtExbpkhJ0DezTXXN06WED3Tn3AkudwOqHWkluaaaCPYLddBOoexVQxgabOfZNBSNBIZAWNBsA2bAXDxBCDhKEX7vi84sDCQY8Igar3Tp9AStHW6QAkuAb7fg9Aj9Dwu7Oait8CLDQu3dPtqWkytVnHRikX2Pa3AxSrdVRqxDQG5Dhc4qiIf9Dj0euw5jojUHAYjZOESQOKaiVl0hZV9gsT9vFd+Cl68OfRrXsKo2T8vt8ZjF/1D1+/PTh+fVApiA9MqCMc1ZTcAxwPO9fiqEdb5+DLpA9Dtwk5Tt2Vuaqu3IuzHbWj2pELuxL0lLBRHkBXkrPNH+ADXZO4OyKpVXifoCZnpBTiuJVYVNustRVYOYgyvPQxJ7bLUTEnEn86mhXc/gFLxpN+72LK7pTcnbdYhgU32xbcOwPnNhCKctzofNjCPxoetQ8O2wcUBqOD7uHgALbtY0jOVwjx0gJi96VnTGx6DRYY73z9qT+Mq3mkG69Lv9TcQXdIdj68HEyfffOcsJhXG9C/3K++wvn7SclEfEk4ojWukF313APa5A/j4eWIUrfm8gc4vMz6umcpx5t1LNjgst+fsH5nMj1NXn/yUCvfWldBYolWfG5s8Xau5WzyDl+bt+Dw2lMzNZMSuHLaomFYbf7y8EKnaavorApfq3eFK4m/UAHqVeKkUgQ+hXbfYL3N8hjh5USlzWpGConi6RNBiWkyg0xQxBaNmO3pvF8So6TCnvgs46ESJHXLHpbqleJfzloxBGoWn/4N33sl1V0SAAA=" target="_blank" rel="noopener"><span class="u-base">https://tricoteuses.fr/recettes/analyser_amendements</span><span class="u-key">?hs=</span><span class="u-val">gz.H4sIAAAAAAACA+1Xy3IaRxTdz1f0DjuFsURkq0qKlcICJXZhIICSyopqZhrcSdM96odK+pvsEr6DH8u9txlmRkaxZKtSWWQh1I+5z3NfPRH2WgTLPpyPWPBSSbdZn7CP3ufu5OXLVZq3UpOJI/xpiYAHSXJutBc6sEwwxZkVqfBewDH+K7ZMOM+kzsTNZi1YzkGCCUpqERzceZaL4JkD4dIin9xI7XGRbdbwMdwbUOraOCZucmUs99JoxyY/9ZtsepsLJzTwMYG51MrcO8aXQnvXSpI+Z3MOd0HLqyBYynXwgtgYOFWwdOnHzXrFgcY5sZorIZpwvpQLy3VKygF37lusblAq4dMqjdDMW37NpVIclZfwpRcr0IM5UH73ZYvDWUYXjp0kSdDkEC/BWlBnIZW3qKFDHi43mgRlHOzF+9QoozUswDXa2BUnjGD/zIsbL2bKyFmQWbTBKe6DFc+bCVkql2AIlzZS58Fv1i4Kcahm1kBdPCd5gv2GIAA1rHN02qxCP6sY0UykYrohbqTzaArqueVihSKotFCKwMwk4Y9oekNIKLIpsgZhrsmA24JDOGRGp3C1mkOY2FIbAOT9ZDh4C7CAJ4CezYWDy1Zy2GJjkX4UFv+IcdXVaN3ObIyLBd/8iQw4y1VwzJp5IANQOVVzEWHRiPmAnPnjnQSh2KkqAzmDhiJnsBVTLrdSpzLnKpn0+r3zacIYbyGStKiDS0cVgONBBnJfnDVkBiLkQqbk+saLs7OGDithTd/oZYN1JixugZte1ijT21SJrvhZCqKCU9jlxhMR7mYZbu+naQjPfVe4qeUyxr4rTomjknOMBOLnjK1zoqQHT1xYvkTSKZqM5Jm8lq4wBTOFJEZHw/E5AOYjz+1lcjEefqhk3GewYZnjyfvhu8E9ScrZcBCxYG/w28olopH88mNv3KOLKGgWv2yMOsft9uFRuwFWdgbdSBrBfgO1IohkOO72xuztrw+BoNubnJ/WgugqNCCEOOU1hGmziCTIGQgmtyeOSg2eKGIqHkWkIu+IU4rLsVhEYOiijN3HBdx/Ds+vwy2WOywsKy4d01CENmtoXN7tTf3/QXqypFtw5b4k69otdsGVmvP096L5bJtExbpkhJ0DezTXXN06WED3Tn3AkudwOqHWkluaaaCPYLddBOoexVQxgabOfZNBSNBIZAWNBsA2bAXDxBCDhKEX7vi84sDCQY8Igar3Tp9AStHW6QAkuAb7fg9Aj9Dwu7Oait8CLDQu3dPtqWkytVnHRikX2Pa3AxSrdVRqxDQG5Dhc4qiIf9Dj0euw5jojUHAYjZOESQOKaiVl0hZV9gsT9vFd+Cl68OfRrXsKo2T8vt8ZjF/1D1+/PTh+fVApiA9MqCMc1ZTcAxwPO9fiqEdb5+DLpA9Dtwk5Tt2Vuaqu3IuzHbWj2pELuxL0lLBRHkBXkrPNH+ADXZO4OyKpVXifoCZnpBTiuJVYVNustRVYOYgyvPQxJ7bLUTEnEn86mhXc/gFLxpN+72LK7pTcnbdYhgU32xbcOwPnNhCKctzofNjCPxoetQ8O2wcUBqOD7uHgALbtY0jOVwjx0gJi96VnTGx6DRYY73z9qT+Mq3mkG69Lv9TcQXdIdj68HEyfffOcsJhXG9C/3K++wvn7SclEfEk4ojWukF313APa5A/j4eWIUrfm8gc4vMz6umcpx5t1LNjgst+fsH5nMj1NXn/yUCvfWldBYolWfG5s8Xau5WzyDl+bt+Dw2lMzNZMSuHLaomFYbf7y8EKnaavorApfq3eFK4m/UAHqVeKkUgQ+hXbfYL3N8hjh5USlzWpGConi6RNBiWkyg0xQxBaNmO3pvF8So6TCnvgs46ESJHXLHpbqleJfzloxBGoWn/4N33sl1V0SAAA=</span></a>
+      <div style="margin-top:0.6rem"><span class="u-label">↳ <span lang="en">SQL recipe, self-contained · from tricoteuses.fr (French parliamentary data) · <a href="https://tricoteuses.fr/recettes/analyser_amendements?hs=gz.H4sIAAAAAAACA+1Xy3IaRxTdz1f0DjuFsURkq0qKlcICJXZhIICSyopqZhrcSdM96odK+pvsEr6DH8u9txlmRkaxZKtSWWQh1I+5z3NfPRH2WgTLPpyPWPBSSbdZn7CP3ufu5OXLVZq3UpOJI/xpiYAHSXJutBc6sEwwxZkVqfBewDH+K7ZMOM+kzsTNZi1YzkGCCUpqERzceZaL4JkD4dIin9xI7XGRbdbwMdwbUOraOCZucmUs99JoxyY/9ZtsepsLJzTwMYG51MrcO8aXQnvXSpI+Z3MOd0HLqyBYynXwgtgYOFWwdOnHzXrFgcY5sZorIZpwvpQLy3VKygF37lusblAq4dMqjdDMW37NpVIclZfwpRcr0IM5UH73ZYvDWUYXjp0kSdDkEC/BWlBnIZW3qKFDHi43mgRlHOzF+9QoozUswDXa2BUnjGD/zIsbL2bKyFmQWbTBKe6DFc+bCVkql2AIlzZS58Fv1i4Kcahm1kBdPCd5gv2GIAA1rHN02qxCP6sY0UykYrohbqTzaArqueVihSKotFCKwMwk4Y9oekNIKLIpsgZhrsmA24JDOGRGp3C1mkOY2FIbAOT9ZDh4C7CAJ4CezYWDy1Zy2GJjkX4UFv+IcdXVaN3ObIyLBd/8iQw4y1VwzJp5IANQOVVzEWHRiPmAnPnjnQSh2KkqAzmDhiJnsBVTLrdSpzLnKpn0+r3zacIYbyGStKiDS0cVgONBBnJfnDVkBiLkQqbk+saLs7OGDithTd/oZYN1JixugZte1ijT21SJrvhZCqKCU9jlxhMR7mYZbu+naQjPfVe4qeUyxr4rTomjknOMBOLnjK1zoqQHT1xYvkTSKZqM5Jm8lq4wBTOFJEZHw/E5AOYjz+1lcjEefqhk3GewYZnjyfvhu8E9ScrZcBCxYG/w28olopH88mNv3KOLKGgWv2yMOsft9uFRuwFWdgbdSBrBfgO1IohkOO72xuztrw+BoNubnJ/WgugqNCCEOOU1hGmziCTIGQgmtyeOSg2eKGIqHkWkIu+IU4rLsVhEYOiijN3HBdx/Ds+vwy2WOywsKy4d01CENmtoXN7tTf3/QXqypFtw5b4k69otdsGVmvP096L5bJtExbpkhJ0DezTXXN06WED3Tn3AkudwOqHWkluaaaCPYLddBOoexVQxgabOfZNBSNBIZAWNBsA2bAXDxBCDhKEX7vi84sDCQY8Igar3Tp9AStHW6QAkuAb7fg9Aj9Dwu7Oait8CLDQu3dPtqWkytVnHRikX2Pa3AxSrdVRqxDQG5Dhc4qiIf9Dj0euw5jojUHAYjZOESQOKaiVl0hZV9gsT9vFd+Cl68OfRrXsKo2T8vt8ZjF/1D1+/PTh+fVApiA9MqCMc1ZTcAxwPO9fiqEdb5+DLpA9Dtwk5Tt2Vuaqu3IuzHbWj2pELuxL0lLBRHkBXkrPNH+ADXZO4OyKpVXifoCZnpBTiuJVYVNustRVYOYgyvPQxJ7bLUTEnEn86mhXc/gFLxpN+72LK7pTcnbdYhgU32xbcOwPnNhCKctzofNjCPxoetQ8O2wcUBqOD7uHgALbtY0jOVwjx0gJi96VnTGx6DRYY73z9qT+Mq3mkG69Lv9TcQXdIdj68HEyfffOcsJhXG9C/3K++wvn7SclEfEk4ojWukF313APa5A/j4eWIUrfm8gc4vMz6umcpx5t1LNjgst+fsH5nMj1NXn/yUCvfWldBYolWfG5s8Xau5WzyDl+bt+Dw2lMzNZMSuHLaomFYbf7y8EKnaavorApfq3eFK4m/UAHqVeKkUgQ+hXbfYL3N8hjh5USlzWpGConi6RNBiWkyg0xQxBaNmO3pvF8So6TCnvgs46ESJHXLHpbqleJfzloxBGoWn/4N33sl1V0SAAA=" target="_blank" rel="noopener">open in a new tab</a></span><span lang="fr">Recette SQL autoportante · depuis tricoteuses.fr (données parlementaires) · <a href="https://tricoteuses.fr/recettes/analyser_amendements?hs=gz.H4sIAAAAAAACA+1Xy3IaRxTdz1f0DjuFsURkq0qKlcICJXZhIICSyopqZhrcSdM96odK+pvsEr6DH8u9txlmRkaxZKtSWWQh1I+5z3NfPRH2WgTLPpyPWPBSSbdZn7CP3ufu5OXLVZq3UpOJI/xpiYAHSXJutBc6sEwwxZkVqfBewDH+K7ZMOM+kzsTNZi1YzkGCCUpqERzceZaL4JkD4dIin9xI7XGRbdbwMdwbUOraOCZucmUs99JoxyY/9ZtsepsLJzTwMYG51MrcO8aXQnvXSpI+Z3MOd0HLqyBYynXwgtgYOFWwdOnHzXrFgcY5sZorIZpwvpQLy3VKygF37lusblAq4dMqjdDMW37NpVIclZfwpRcr0IM5UH73ZYvDWUYXjp0kSdDkEC/BWlBnIZW3qKFDHi43mgRlHOzF+9QoozUswDXa2BUnjGD/zIsbL2bKyFmQWbTBKe6DFc+bCVkql2AIlzZS58Fv1i4Kcahm1kBdPCd5gv2GIAA1rHN02qxCP6sY0UykYrohbqTzaArqueVihSKotFCKwMwk4Y9oekNIKLIpsgZhrsmA24JDOGRGp3C1mkOY2FIbAOT9ZDh4C7CAJ4CezYWDy1Zy2GJjkX4UFv+IcdXVaN3ObIyLBd/8iQw4y1VwzJp5IANQOVVzEWHRiPmAnPnjnQSh2KkqAzmDhiJnsBVTLrdSpzLnKpn0+r3zacIYbyGStKiDS0cVgONBBnJfnDVkBiLkQqbk+saLs7OGDithTd/oZYN1JixugZte1ijT21SJrvhZCqKCU9jlxhMR7mYZbu+naQjPfVe4qeUyxr4rTomjknOMBOLnjK1zoqQHT1xYvkTSKZqM5Jm8lq4wBTOFJEZHw/E5AOYjz+1lcjEefqhk3GewYZnjyfvhu8E9ScrZcBCxYG/w28olopH88mNv3KOLKGgWv2yMOsft9uFRuwFWdgbdSBrBfgO1IohkOO72xuztrw+BoNubnJ/WgugqNCCEOOU1hGmziCTIGQgmtyeOSg2eKGIqHkWkIu+IU4rLsVhEYOiijN3HBdx/Ds+vwy2WOywsKy4d01CENmtoXN7tTf3/QXqypFtw5b4k69otdsGVmvP096L5bJtExbpkhJ0DezTXXN06WED3Tn3AkudwOqHWkluaaaCPYLddBOoexVQxgabOfZNBSNBIZAWNBsA2bAXDxBCDhKEX7vi84sDCQY8Igar3Tp9AStHW6QAkuAb7fg9Aj9Dwu7Oait8CLDQu3dPtqWkytVnHRikX2Pa3AxSrdVRqxDQG5Dhc4qiIf9Dj0euw5jojUHAYjZOESQOKaiVl0hZV9gsT9vFd+Cl68OfRrXsKo2T8vt8ZjF/1D1+/PTh+fVApiA9MqCMc1ZTcAxwPO9fiqEdb5+DLpA9Dtwk5Tt2Vuaqu3IuzHbWj2pELuxL0lLBRHkBXkrPNH+ADXZO4OyKpVXifoCZnpBTiuJVYVNustRVYOYgyvPQxJ7bLUTEnEn86mhXc/gFLxpN+72LK7pTcnbdYhgU32xbcOwPnNhCKctzofNjCPxoetQ8O2wcUBqOD7uHgALbtY0jOVwjx0gJi96VnTGx6DRYY73z9qT+Mq3mkG69Lv9TcQXdIdj68HEyfffOcsJhXG9C/3K++wvn7SclEfEk4ojWukF313APa5A/j4eWIUrfm8gc4vMz6umcpx5t1LNjgst+fsH5nMj1NXn/yUCvfWldBYolWfG5s8Xau5WzyDl+bt+Dw2lMzNZMSuHLaomFYbf7y8EKnaavorApfq3eFK4m/UAHqVeKkUgQ+hXbfYL3N8hjh5USlzWpGConi6RNBiWkyg0xQxBaNmO3pvF8So6TCnvgs46ESJHXLHpbqleJfzloxBGoWn/4N33sl1V0SAAA=" target="_blank" rel="noopener">ouvrir dans un nouvel onglet</a></span></span></div>
+    </div>
+
+    <div class="format-box">
+      <div class="format-box-header">
+        <span lang="en">HyperSkill format — hyperskills.net</span>
+        <span lang="fr">Format HyperSkill — hyperskills.net</span>
+      </div>
+      <div class="format-box-body">
+        <div class="format-field">
+          <div class="format-field-key">
+            <span lang="en">Content (free-form)</span>
+            <span lang="fr">Contenu (libre)</span>
+          </div>
+          <div class="format-field-val" lang="en">Markdown, SQL, YAML, HTML, plain text — any format. The <a href="https://agentskills.io" target="_blank">Agent Skills</a> format is recommended but not required.</div>
+          <div class="format-field-val" lang="fr">Markdown, SQL, YAML, HTML, texte brut — n'importe quel format. Le format <a href="https://agentskills.io" target="_blank">Agent Skills</a> est recommandé mais pas obligatoire.</div>
+        </div>
+        <div class="format-field">
+          <div class="format-field-key">
+            <span lang="en">Encoding</span>
+            <span lang="fr">Encodage</span>
+          </div>
+          <div class="format-field-val" lang="en">base64 in <code>?hs=</code>. Prefix <code>gz.</code> or <code>br.</code> for compressed skills. With compression, 250–500 KB fits in ~32,000 characters.</div>
+          <div class="format-field-val" lang="fr">base64 dans <code>?hs=</code>. Préfixe <code>gz.</code> ou <code>br.</code> pour les recettes (skills) compressées. Avec compression, 250–500 Ko tient en ~32 000 caractères.</div>
+        </div>
+        <div class="format-field">
+          <div class="format-field-key">
+            <span lang="en">Traceability</span>
+            <span lang="fr">Traçabilité</span>
+          </div>
+          <div class="format-field-val" lang="en">SHA-256 of source URL + content. Each version can reference the previous hash. Recommended, not required.</div>
+          <div class="format-field-val" lang="fr">SHA-256 de l'URL source + contenu. Chaque version peut référencer le hash précédent. Recommandé, pas obligatoire.</div>
+        </div>
+        <div class="format-field">
+          <div class="format-field-key">
+            <span lang="en">Signature</span>
+            <span lang="fr">Signature</span>
+          </div>
+          <div class="format-field-val" lang="en">The author can sign the hash. Ed25519 recommended. No central authority — cryptography is the trust model.</div>
+          <div class="format-field-val" lang="fr">L'auteur peut signer le hash. Ed25519 recommandé. Pas d'autorité centrale — la cryptographie est le modèle de confiance.</div>
+        </div>
+      </div>
+    </div>
+
+    <div lang="en">
+      <p>The format is intentionally agnostic about content. A hyperskill can be a SQL recipe for querying parliamentary data (as on <a href="https://tricoteuses.fr" target="_blank">tricoteuses.fr</a>), a Markdown guide for analysing legal texts, a YAML workflow for an AI agent, or a structured UI composition. The URL origin provides the context; the <code>?hs=</code> parameter carries the knowledge. Two examples show the range:</p>
+    </div>
+
+    <div lang="fr">
+      <p>Le format est intentionnellement agnostique sur le contenu. Une hyper-recette (hyperskill) peut être une recette SQL pour interroger des données parlementaires (comme sur <a href="https://tricoteuses.fr" target="_blank">tricoteuses.fr</a>), un guide Markdown pour analyser des textes juridiques, un workflow YAML pour un agent IA, ou une composition UI structurée. L'origine de l'URL fournit le contexte ; le paramètre <code>?hs=</code> transporte la connaissance. Deux exemples illustrent l'étendue du format :</p>
+    </div>
+
+    <!-- ═══ EXAMPLES EN ═══ -->
+    <div lang="en" class="examples-grid">
+
+      <!-- EN Example 1: source skill (condensed — full SQL in FR version) -->
+      <div class="format-box" style="margin:0">
+        <div class="format-box-header" style="display:flex;justify-content:space-between;align-items:center">
+          <span>tricoteuses.fr — skill source</span>
+          <span style="font-weight:300;opacity:0.6;font-size:0.6rem">SQL · Markdown</span>
+        </div>
+        <div style="padding:1rem;font-family:'DM Mono',monospace;font-size:0.68rem;line-height:1.7;background:var(--code-bg);color:var(--code-text)">
+          <div style="color:#8a8070">---</div>
+          <div><span style="color:#a8d8a8">title:</span>  <span style="color:#e8e0d0">Analyse amendments</span></div>
+          <div><span style="color:#a8d8a8">desc:</span>   <span style="color:#8a8070">SQL recipes on assemblee.*</span></div>
+          <div><span style="color:#a8d8a8">tags:</span>   <span style="color:#ffbd2e">[sql, jsonb, assemblée]</span></div>
+          <div><span style="color:#a8d8a8">hash:</span>   <span style="color:#c8401a">a3f7c2d9…</span></div>
+          <div style="color:#8a8070">---</div>
+          <br>
+          <div style="color:#8a8070"># The `canutes` database exposes</div>
+          <div style="color:#8a8070"># schemas assemblee, legifrance,</div>
+          <div style="color:#8a8070"># senat. This recipe targets</div>
+          <div style="color:#8a8070"># `assemblee.amendements`.</div>
+          <br>
+          <div style="color:#555">## 1. Amendments by a deputy</div>
+          <div><span style="color:#c8401a">SELECT</span> <span style="color:#e8e0d0">a.uid, a.texte_loi_uid,</span></div>
+          <div><span style="color:#e8e0d0">  a.data->'identification'</span></div>
+          <div><span style="color:#e8e0d0">    ->>'numeroLong' AS num</span></div>
+          <div><span style="color:#c8401a">FROM</span>   <span style="color:#6eb4f7">assemblee.deputes_sig dsa</span></div>
+          <div><span style="color:#c8401a">JOIN</span>   <span style="color:#6eb4f7">assemblee.amendements a</span></div>
+          <div><span style="color:#e8e0d0">  ON a.uid = dsa.amendement_uid</span></div>
+          <div><span style="color:#c8401a">WHERE</span>  <span style="color:#e8e0d0">dsa.depute_uid =</span> <span style="color:#a8d8a8">'PA722142'</span></div>
+          <div><span style="color:#c8401a">ORDER BY</span> <span style="color:#e8e0d0">date_depot DESC;</span></div>
+          <br>
+          <div style="color:#555">## 2. JSONB fallback …</div>
+          <div style="color:#555">## 3. Filter by bill …</div>
+          <div style="color:#555">## 4–6. Dossier, groups, co-sign …</div>
+        </div>
+        <div style="padding:0.5rem 1rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);border-top:1px solid var(--border)">4 895 B · 6 528 chars b64 · tricoteuses.fr</div>
+      </div>
+
+      <!-- EN Example 2: UI skill — parliamentary dashboard -->
+      <div class="format-box" style="margin:0">
+        <div class="format-box-header" style="display:flex;justify-content:space-between;align-items:center">
+          <span>webmcp-auto-ui · Deputy PA722142</span>
+          <span style="font-weight:300;opacity:0.6;font-size:0.6rem">rendered UI skill</span>
+        </div>
+        <div style="padding:0.9rem;background:#f9f7f4;display:flex;flex-direction:column;gap:0.7rem">
+
+          <!-- stat cards -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem">
+            <div style="background:white;border:1px solid var(--border);padding:0.6rem 0.7rem;border-radius:3px">
+              <div style="font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px">Amendments</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--ink)">1 847</div>
+              <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--accent2);margin-top:2px">16th legislature</div>
+            </div>
+            <div style="background:white;border:1px solid var(--border);padding:0.6rem 0.7rem;border-radius:3px">
+              <div style="font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px">Adopted</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--ink)">312</div>
+              <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:#27a05a;margin-top:2px">16.9% rate</div>
+            </div>
+            <div style="background:white;border:1px solid var(--border);padding:0.6rem 0.7rem;border-radius:3px">
+              <div style="font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px">Co-signed</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--ink)">589</div>
+              <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);margin-top:2px">with 43 deputies</div>
+            </div>
+          </div>
+
+          <!-- bar chart: amendments by parliamentary group -->
+          <div style="background:white;border:1px solid var(--border);padding:0.7rem;border-radius:3px">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem">Amendments by group (top 5)</div>
+            <svg viewBox="0 0 260 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+              <!-- grid -->
+              <line x1="58" y1="8"  x2="256" y2="8"  stroke="#e8e4dc" stroke-width="0.5"/>
+              <line x1="58" y1="25" x2="256" y2="25" stroke="#e8e4dc" stroke-width="0.5"/>
+              <line x1="58" y1="42" x2="256" y2="42" stroke="#e8e4dc" stroke-width="0.5"/>
+              <line x1="58" y1="59" x2="256" y2="59" stroke="#e8e4dc" stroke-width="0.5"/>
+              <line x1="58" y1="76" x2="256" y2="76" stroke="#d4cfc7" stroke-width="0.5"/>
+              <!-- horizontal bars — max=580, scale to 198px -->
+              <!-- RN: 580 → 198px -->
+              <rect x="58" y="10" width="198" height="12" fill="#c8401a" rx="1"/>
+              <text x="55" y="19" text-anchor="end" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">RN</text>
+              <text x="260" y="19" font-family="DM Mono,monospace" font-size="6" fill="#c8401a">580</text>
+              <!-- LFI: 412 → 140px -->
+              <rect x="58" y="27" width="140" height="12" fill="#1a5fc8" rx="1"/>
+              <text x="55" y="36" text-anchor="end" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">LFI</text>
+              <text x="202" y="36" font-family="DM Mono,monospace" font-size="6" fill="#1a5fc8">412</text>
+              <!-- EPR: 298 → 102px -->
+              <rect x="58" y="44" width="102" height="12" fill="#8a8070" rx="1"/>
+              <text x="55" y="53" text-anchor="end" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">EPR</text>
+              <text x="164" y="53" font-family="DM Mono,monospace" font-size="6" fill="#8a8070">298</text>
+              <!-- SOC: 187 → 64px -->
+              <rect x="58" y="61" width="64" height="12" fill="#6b6560" rx="1"/>
+              <text x="55" y="70" text-anchor="end" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">SOC</text>
+              <text x="126" y="70" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">187</text>
+              <!-- ECO: 94 → 32px -->
+              <rect x="58" y="78" width="32" height="10" fill="#a8d8a8" rx="1"/>
+              <text x="55" y="86" text-anchor="end" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">ECO</text>
+              <text x="94"  y="86" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">94</text>
+            </svg>
+          </div>
+
+          <!-- sparkline: legislative activity over sessions -->
+          <div style="background:white;border:1px solid var(--border);padding:0.7rem;border-radius:3px">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem">Filing activity — last 12 sessions</div>
+            <svg viewBox="0 0 260 40" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+              <defs><linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8401a" stop-opacity="0.15"/><stop offset="100%" stop-color="#c8401a" stop-opacity="0"/></linearGradient></defs>
+              <path d="M0,35 C15,30 25,28 40,22 C55,16 65,20 80,18 C95,16 105,10 120,8 C135,6 145,12 160,9 C175,6 185,4 200,7 C215,10 225,5 240,3 C248,2 255,4 260,3 L260,40 L0,40 Z" fill="url(#sg1)"/>
+              <path d="M0,35 C15,30 25,28 40,22 C55,16 65,20 80,18 C95,16 105,10 120,8 C135,6 145,12 160,9 C175,6 185,4 200,7 C215,10 225,5 240,3 C248,2 255,4 260,3" fill="none" stroke="#c8401a" stroke-width="1.5"/>
+              <circle cx="260" cy="3" r="2.5" fill="#c8401a"/>
+            </svg>
+          </div>
+
+          <!-- alert -->
+          <div style="background:#fff8e6;border:1px solid #e8c84a;border-left:3px solid #c8401a;padding:0.5rem 0.7rem;border-radius:0 3px 3px 0;font-size:0.78rem">
+            <span style="font-family:'DM Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:#c8401a;display:block;margin-bottom:2px">⚠ note</span>
+            <span style="color:#1a1714">Bill PRJLANR5L16B0760 — 14 amendments filed, vote pending.</span>
+          </div>
+
+          <!-- table: top co-signatories -->
+          <div style="background:white;border:1px solid var(--border);border-radius:3px;overflow:hidden">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;padding:0.4rem 0.7rem;border-bottom:1px solid var(--border)">Top co-signatories</div>
+            <table style="width:100%;border-collapse:collapse;font-size:0.72rem">
+              <thead><tr style="background:rgba(0,0,0,0.03)">
+                <th style="text-align:left;padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.58rem;font-weight:500;color:var(--muted)">Deputy</th>
+                <th style="text-align:left;padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.58rem;font-weight:500;color:var(--muted)">Group</th>
+                <th style="text-align:right;padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.58rem;font-weight:500;color:var(--muted)">Joint</th>
+              </tr></thead>
+              <tbody>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:3px 8px">M. Dupont</td><td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">LFI</td><td style="padding:3px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:0.68rem">84</td></tr>
+                <tr style="border-top:1px solid var(--border);background:rgba(0,0,0,0.015)"><td style="padding:3px 8px">C. Martin</td><td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">LFI</td><td style="padding:3px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:0.68rem">71</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:3px 8px">A. Bernard</td><td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">SOC</td><td style="padding:3px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:0.68rem">58</td></tr>
+                <tr style="border-top:1px solid var(--border);background:rgba(0,0,0,0.015)"><td style="padding:3px 8px">P. Leblanc</td><td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">ECO</td><td style="padding:3px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:0.68rem">43</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:3px 8px">S. Petit</td><td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">LFI</td><td style="padding:3px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:0.68rem">39</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div style="padding:0.5rem 1rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);border-top:1px solid var(--border)">3 180 B · 4 240 chars b64 · tricoteuses.fr/mcp</div>
+      </div>
+
+    </div>
+
+    <!-- ═══ EXAMPLES FR ═══ -->
+    <div lang="fr" class="examples-grid">
+
+      <!-- FR Example 1: SQL skill (tricoteuses) — same content, French labels -->
+      <div class="format-box" style="margin:0">
+        <div class="format-box-header" style="display:flex;justify-content:space-between;align-items:center">
+          <span>tricoteuses.fr</span>
+          <span style="font-weight:300;opacity:0.6;font-size:0.6rem">SQL · recette Markdown</span>
+        </div>
+        <div style="padding:1rem;font-family:'DM Mono',monospace;font-size:0.68rem;line-height:1.7;background:var(--code-bg);color:var(--code-text)">
+          <div style="color:#8a8070">---</div>
+          <div><span style="color:#a8d8a8">title:</span> <span style="color:#e8e0d0">Analyser les amendements</span></div>
+          <div><span style="color:#a8d8a8">tags:</span>  <span style="color:#ffbd2e">[sql, jsonb, assemblée]</span></div>
+          <div style="color:#8a8070">---</div>
+          <br>
+          <div style="color:#8a8070"># La base `canutes` expose les</div>
+          <div style="color:#8a8070"># schémas assemblee, legifrance,</div>
+          <div style="color:#8a8070"># senat. Cette recette cible</div>
+          <div style="color:#8a8070"># `assemblee.amendements`.</div>
+          <br>
+          <div style="color:#8a8070">## 1. Amendements d'un député</div>
+          <div><span style="color:#c8401a">SELECT</span> <span style="color:#e8e0d0">a.uid,</span></div>
+          <div><span style="color:#e8e0d0">  a.texte_loi_uid,</span></div>
+          <div><span style="color:#e8e0d0">  a.legislature,</span></div>
+          <div><span style="color:#e8e0d0">  a.data->'identification'</span></div>
+          <div><span style="color:#e8e0d0">    ->>'numeroLong' AS num</span></div>
+          <div><span style="color:#c8401a">FROM</span> <span style="color:#6eb4f7">assemblee.deputes_sig dsa</span></div>
+          <div><span style="color:#c8401a">JOIN</span> <span style="color:#6eb4f7">assemblee.amendements a</span></div>
+          <div><span style="color:#e8e0d0">  ON a.uid = dsa.amendement_uid</span></div>
+          <div><span style="color:#c8401a">WHERE</span> <span style="color:#e8e0d0">dsa.depute_uid =</span> <span style="color:#a8d8a8">'PA722142'</span></div>
+          <div><span style="color:#c8401a">ORDER BY</span> <span style="color:#e8e0d0">date_depot DESC;</span></div>
+          <br>
+          <div style="color:#555">## 2. Fallback JSONB …</div>
+          <div style="color:#555">## 3. Filtrer par texte …</div>
+          <div style="color:#555">## 4. Relier au dossier …</div>
+          <div style="color:#555">## 5. Regrouper par dossier …</div>
+          <div style="color:#555">## 6. Cosignataires …</div>
+        </div>
+        <div style="padding:0.5rem 1rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);border-top:1px solid var(--border)">4 895 B · 6 528 car. b64</div>
+      </div>
+
+      <!-- FR Example 2: UI skill — tableau de bord parlementaire -->
+      <div class="format-box" style="margin:0">
+        <div class="format-box-header" style="display:flex;justify-content:space-between;align-items:center">
+          <span>webmcp-auto-ui · Député PA722142</span>
+          <span style="font-weight:300;opacity:0.6;font-size:0.6rem">recette UI rendue</span>
+        </div>
+        <div style="padding:0.9rem;background:#f9f7f4;display:flex;flex-direction:column;gap:0.7rem">
+
+          <!-- stat cards -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem">
+            <div style="background:white;border:1px solid var(--border);padding:0.6rem 0.7rem;border-radius:3px">
+              <div style="font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px">Amendements</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--ink)">1 847</div>
+              <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--accent2);margin-top:2px">16e législature</div>
+            </div>
+            <div style="background:white;border:1px solid var(--border);padding:0.6rem 0.7rem;border-radius:3px">
+              <div style="font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px">Adoptés</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--ink)">312</div>
+              <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:#27a05a;margin-top:2px">taux 16,9%</div>
+            </div>
+            <div style="background:white;border:1px solid var(--border);padding:0.6rem 0.7rem;border-radius:3px">
+              <div style="font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px">Cosignés</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--ink)">589</div>
+              <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);margin-top:2px">avec 43 députés</div>
+            </div>
+          </div>
+
+          <!-- bar chart: amendements par groupe -->
+          <div style="background:white;border:1px solid var(--border);padding:0.7rem;border-radius:3px">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem">Amendements par groupe (top 5)</div>
+            <svg viewBox="0 0 260 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+              <line x1="58" y1="8"  x2="256" y2="8"  stroke="#e8e4dc" stroke-width="0.5"/>
+              <line x1="58" y1="25" x2="256" y2="25" stroke="#e8e4dc" stroke-width="0.5"/>
+              <line x1="58" y1="42" x2="256" y2="42" stroke="#e8e4dc" stroke-width="0.5"/>
+              <line x1="58" y1="59" x2="256" y2="59" stroke="#e8e4dc" stroke-width="0.5"/>
+              <line x1="58" y1="76" x2="256" y2="76" stroke="#d4cfc7" stroke-width="0.5"/>
+              <rect x="58" y="10" width="198" height="12" fill="#c8401a" rx="1"/>
+              <text x="55" y="19" text-anchor="end" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">RN</text>
+              <text x="260" y="19" font-family="DM Mono,monospace" font-size="6" fill="#c8401a">580</text>
+              <rect x="58" y="27" width="140" height="12" fill="#1a5fc8" rx="1"/>
+              <text x="55" y="36" text-anchor="end" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">LFI</text>
+              <text x="202" y="36" font-family="DM Mono,monospace" font-size="6" fill="#1a5fc8">412</text>
+              <rect x="58" y="44" width="102" height="12" fill="#8a8070" rx="1"/>
+              <text x="55" y="53" text-anchor="end" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">EPR</text>
+              <text x="164" y="53" font-family="DM Mono,monospace" font-size="6" fill="#8a8070">298</text>
+              <rect x="58" y="61" width="64" height="12" fill="#6b6560" rx="1"/>
+              <text x="55" y="70" text-anchor="end" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">SOC</text>
+              <text x="126" y="70" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">187</text>
+              <rect x="58" y="78" width="32" height="10" fill="#a8d8a8" rx="1"/>
+              <text x="55" y="86" text-anchor="end" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">ECO</text>
+              <text x="94"  y="86" font-family="DM Mono,monospace" font-size="6" fill="#6b6560">94</text>
+            </svg>
+          </div>
+
+          <!-- sparkline: activité législative -->
+          <div style="background:white;border:1px solid var(--border);padding:0.7rem;border-radius:3px">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem">Activité de dépôt — 12 dernières séances</div>
+            <svg viewBox="0 0 260 40" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+              <defs><linearGradient id="sg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8401a" stop-opacity="0.15"/><stop offset="100%" stop-color="#c8401a" stop-opacity="0"/></linearGradient></defs>
+              <path d="M0,35 C15,30 25,28 40,22 C55,16 65,20 80,18 C95,16 105,10 120,8 C135,6 145,12 160,9 C175,6 185,4 200,7 C215,10 225,5 240,3 C248,2 255,4 260,3 L260,40 L0,40 Z" fill="url(#sg2)"/>
+              <path d="M0,35 C15,30 25,28 40,22 C55,16 65,20 80,18 C95,16 105,10 120,8 C135,6 145,12 160,9 C175,6 185,4 200,7 C215,10 225,5 240,3 C248,2 255,4 260,3" fill="none" stroke="#c8401a" stroke-width="1.5"/>
+              <circle cx="260" cy="3" r="2.5" fill="#c8401a"/>
+            </svg>
+          </div>
+
+          <!-- alert -->
+          <div style="background:#fff8e6;border:1px solid #e8c84a;border-left:3px solid #c8401a;padding:0.5rem 0.7rem;border-radius:0 3px 3px 0;font-size:0.78rem">
+            <span style="font-family:'DM Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:#c8401a;display:block;margin-bottom:2px">⚠ note</span>
+            <span style="color:#1a1714">Texte PRJLANR5L16B0760 — 14 amendements déposés, vote en attente.</span>
+          </div>
+
+          <!-- table: cosignataires actifs -->
+          <div style="background:white;border:1px solid var(--border);border-radius:3px;overflow:hidden">
+            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;padding:0.4rem 0.7rem;border-bottom:1px solid var(--border)">Principaux cosignataires</div>
+            <table style="width:100%;border-collapse:collapse;font-size:0.72rem">
+              <thead><tr style="background:rgba(0,0,0,0.03)">
+                <th style="text-align:left;padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.58rem;font-weight:500;color:var(--muted)">Député</th>
+                <th style="text-align:left;padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.58rem;font-weight:500;color:var(--muted)">Groupe</th>
+                <th style="text-align:right;padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.58rem;font-weight:500;color:var(--muted)">Communs</th>
+              </tr></thead>
+              <tbody>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:3px 8px">M. Dupont</td><td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">LFI</td><td style="padding:3px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:0.68rem">84</td></tr>
+                <tr style="border-top:1px solid var(--border);background:rgba(0,0,0,0.015)"><td style="padding:3px 8px">C. Martin</td><td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">LFI</td><td style="padding:3px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:0.68rem">71</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:3px 8px">A. Bernard</td><td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">SOC</td><td style="padding:3px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:0.68rem">58</td></tr>
+                <tr style="border-top:1px solid var(--border);background:rgba(0,0,0,0.015)"><td style="padding:3px 8px">P. Leblanc</td><td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">ECO</td><td style="padding:3px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:0.68rem">43</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:3px 8px">S. Petit</td><td style="padding:3px 8px;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">LFI</td><td style="padding:3px 8px;text-align:right;font-family:'DM Mono',monospace;font-size:0.68rem">39</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div style="padding:0.5rem 1rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);border-top:1px solid var(--border)">3 180 B · 4 240 car. b64 · tricoteuses.fr/mcp</div>
+      </div>
+
+    </div>
+
+    <div class="section-divider">II</div>
+
+    <!-- ═══ COMMONS -->
+    <h2>
+      <span lang="en">Why skills are digital commons</span>
+      <span lang="fr">Pourquoi les recettes (skills) sont des communs numériques</span>
+    </h2>
+
+    <div lang="en">
+      <p>Digital commons theory, built on Elinor Ostrom's work and adapted for the web, identifies three conditions for a resource to be a commons: it must be <strong>non-excludable</strong> (no one can be prevented from using it), <strong>non-rival</strong> (one person's use doesn't diminish another's), and <strong>collectively governed</strong> rather than controlled by a single owner who can restrict or monetise access unilaterally.</p>
+
+      <p>A hyperskill satisfies all three conditions structurally — not by political declaration, but because the format makes it impossible to be otherwise. It is non-excludable because it lives in a URL anyone with the link can open. It is non-rival because sharing a recipe doesn't degrade it — a thousand people can use the same skill simultaneously without anyone being worse off. And it has no central owner because the content lives in the URL itself, not on any server that could be taken down, paywalled, or acquired.</p>
+    </div>
+
+    <div lang="fr">
+      <p>La théorie des communs numériques, construite sur les travaux d'Elinor Ostrom et adaptée au web, identifie trois conditions pour qu'une ressource soit un commun : elle doit être <strong>non-exclusive</strong> (personne ne peut en être exclu), <strong>non-rivale</strong> (l'usage par l'un ne diminue pas celui de l'autre), et <strong>gouvernée collectivement</strong> plutôt que contrôlée par un propriétaire unique pouvant restreindre ou monétiser l'accès unilatéralement.</p>
+
+      <p>Une hyper-recette (hyperskill) satisfait ces trois conditions structurellement — pas par déclaration politique, mais parce que le format rend impossible qu'il en soit autrement. Elle est non-exclusive parce qu'elle vit dans une URL que quiconque possédant le lien peut ouvrir. Elle est non-rivale parce que partager une recette ne la dégrade pas — mille personnes peuvent utiliser la même skill simultanément sans que personne ne soit lésé. Et elle n'a pas de propriétaire central parce que le contenu vit dans l'URL elle-même, pas sur un serveur qui pourrait être fermé, mis derrière un paywall ou racheté.</p>
+    </div>
+
+    <div class="pullquote">
+      <p lang="en">What circulates as a common is not an interface, not a tool — it's <em>procedural knowledge</em>: how to query this dataset, how to structure this workflow, how to compose this view.</p>
+      <p lang="fr">Ce qui circule comme commun, ce n'est pas une interface, pas un outil — c'est de la <em>connaissance procédurale</em> : comment interroger ce jeu de données, structurer ce workflow, composer cette vue.</p>
+    </div>
+
+    <div lang="en">
+      <p>This is what distinguishes a hyperskill from a shareable document. A recipe shared as a PDF or a GitHub Gist is a common in spirit — you can copy it and distribute it. But it requires a platform to host it (GitHub, Google Drive, a file server), an account to access it in many cases, and a human to retrieve and apply it manually. A hyperskill is <em>executable by an agent</em>: loading it means the agent can immediately use the knowledge it encodes. The skill is simultaneously its own documentation and its own delivery mechanism.</p>
+    </div>
+
+    <div lang="fr">
+      <p>C'est ce qui distingue une hyper-recette (hyperskill) d'un document partageable. Une recette partagée en PDF ou comme GitHub Gist est un commun dans l'esprit — on peut la copier et la distribuer. Mais elle nécessite une plateforme pour l'héberger (GitHub, Google Drive, un serveur de fichiers), souvent un compte pour y accéder, et un humain pour la récupérer et l'appliquer manuellement. Une hyper-recette (hyperskill) est <em>exécutable par un agent</em> : la charger signifie que l'agent peut immédiatement utiliser la connaissance qu'elle encode. La recette (skill) est simultanément sa propre documentation et son propre mécanisme de livraison.</p>
+    </div>
+
+    <div class="section-divider">III</div>
+
+    <!-- ═══ TRACEABILITY -->
+    <h2>
+      <span lang="en">Traceability without a central authority</span>
+      <span lang="fr">Traçabilité sans autorité centrale</span>
+    </h2>
+
+    <div lang="en">
+      <p>One objection to URL-encoded content is trust: how do you know the skill hasn't been tampered with? How do you track versions? How do you establish authorship? HyperSkills answers all three questions with cryptography, not with a platform.</p>
+
+      <p>The <strong>SHA-256 hash</strong> is computed over the source URL concatenated with the content. This means the same content published at two different URLs produces two different hashes — provenance is part of identity. A hash mismatch tells you immediately that the URL, the content, or both have changed since the hash was computed.</p>
+
+      <p><strong>Version chaining</strong> works like Git commits: each version of a skill can embed the hash of the previous one in its metadata. Following the chain reconstructs the full history of a recipe without any central repository. Any tool implementing the format can verify the chain locally.</p>
+
+      <p><strong>Ed25519 signatures</strong> let authors sign their hashes. The signature is optional — HyperSkills work without it — but it provides a strong proof of authorship for skills where that matters (legal, medical, institutional knowledge).</p>
+    </div>
+
+    <div lang="fr">
+      <p>Une objection au contenu encodé dans l'URL est la confiance : comment savoir que la recette (skill) n'a pas été falsifiée ? Comment tracer les versions ? Comment établir la paternité ? HyperSkills répond à ces trois questions par la cryptographie, pas par une plateforme.</p>
+
+      <p>Le <strong>hash SHA-256</strong> est calculé sur la concaténation de l'URL source et du contenu. Cela signifie que le même contenu publié à deux URLs différentes produit deux hashes différents — la provenance fait partie de l'identité. Un hash incohérent indique immédiatement que l'URL, le contenu, ou les deux ont changé depuis le calcul du hash.</p>
+
+      <p>Le <strong>chaînage de versions</strong> fonctionne comme les commits Git : chaque version d'une recette (skill) peut embarquer le hash de la précédente dans ses métadonnées. Suivre la chaîne reconstitue l'historique complet d'une recette sans dépôt central. N'importe quel outil implémentant le format peut vérifier la chaîne localement.</p>
+
+      <p>Les <strong>signatures Ed25519</strong> permettent aux auteurs de signer leurs hashes. La signature est optionnelle — les HyperSkills fonctionnent sans — mais elle fournit une preuve forte de paternité pour les recettes (skills) où c'est important (connaissance juridique, médicale, institutionnelle).</p>
+    </div>
+
+    <pre><span class="cm"><span lang="en"># Hyperskill traceability — all optional but chainable</span><span lang="fr"># Traçabilité HyperSkill — tout optionnel mais chaînable</span></span>
+
+<span class="prop">hash</span>:         <span class="str">a3f7c2d9e1b84f6c…</span>  <span class="cm"><span lang="en"># SHA-256(source_url + content)</span><span lang="fr"># SHA-256(url_source + contenu)</span></span>
+<span class="prop">previousHash</span>: <span class="str">9b1e44f10c723a8d…</span>  <span class="cm"><span lang="en"># links to previous version</span><span lang="fr"># lien vers la version précédente</span></span>
+<span class="prop">signature</span>:    <span class="str">Ed25519:4a7f…</span>       <span class="cm"><span lang="en"># author signs the hash</span><span lang="fr"># l'auteur signe le hash</span></span></pre>
+
+    <div lang="en">
+      <p>This architecture gives HyperSkills something rare: <strong>decentralised provenance</strong>. You can verify the origin and integrity of a skill without trusting any third party. The cryptography is the trust model.</p>
+    </div>
+
+    <div lang="fr">
+      <p>Cette architecture donne aux HyperSkills quelque chose de rare : une <strong>provenance décentralisée</strong>. On peut vérifier l'origine et l'intégrité d'une recette (skill) sans faire confiance à un tiers. La cryptographie est le modèle de confiance.</p>
+    </div>
+
+    <div class="section-divider">IV</div>
+
+    <!-- ═══ LIFECYCLE -->
+    <h2>
+      <span lang="en">A skill's lifecycle in practice</span>
+      <span lang="fr">Le cycle de vie d'une recette (skill) en pratique</span>
+    </h2>
+
+    <div lang="en">
+      <p>The best existing example of HyperSkills in production is <a href="https://tricoteuses.fr" target="_blank">tricoteuses.fr</a> — a civic tech platform for querying French parliamentary data. Its SQL recipes circulate as hyperskill URLs. A user who finds a recipe for analysing amendments can open it, see the full SQL in the viewer, adapt it to their needs, and share their modified version as a new URL. The chain of hashes connects all versions without any repository.</p>
+
+      <p>Another implementation — <strong>webmcp-auto-ui</strong> — shows what this looks like for UI compositions. A user connects the tool to any MCP server, asks a question in natural language, and gets a dashboard assembled from typed blocks (stat cards, charts, tables, timelines). They can then export the entire composition as a hyperskill: the block structure, the data, the MCP server URL, the LLM context, all encoded in a single sharable URL. A colleague opens the URL, gets the same composition against their own data, modifies it, and reshares.</p>
+    </div>
+
+    <div lang="fr">
+      <p>Le meilleur exemple existant de HyperSkills en production est <a href="https://tricoteuses.fr" target="_blank">tricoteuses.fr</a> — une plateforme civic tech pour interroger les données parlementaires françaises. Ses recettes SQL circulent sous forme d'URLs hyperskill. Un utilisateur qui trouve une recette pour analyser les amendements peut l'ouvrir, voir le SQL complet dans le viewer, l'adapter à ses besoins, et partager sa version modifiée comme nouvelle URL. La chaîne de hashes relie toutes les versions sans aucun dépôt.</p>
+
+      <p>Une autre implémentation — <strong>webmcp-auto-ui</strong> — montre à quoi ça ressemble pour des compositions UI. Un utilisateur connecte l'outil à n'importe quel serveur MCP, pose une question en langage naturel, et obtient un tableau de bord assemblé depuis des blocs typés (stat cards, graphiques, tableaux, timelines). Il peut ensuite exporter la composition complète comme hyperskill : la structure des blocs, les données, l'URL du serveur MCP, le contexte LLM, le tout encodé dans une seule URL partageable. Un collègue ouvre l'URL, obtient la même composition sur ses propres données, la modifie, et la repartage.</p>
+    </div>
+
+    <div class="info-box">
+      <strong lang="en">The key pattern</strong>
+      <strong lang="fr">Le pattern clé</strong>
+      <span lang="en">In both cases, what circulates is not a screenshot or an export — it's the procedural knowledge of <em>how to do the thing</em>. The skill carries everything needed to reproduce the result in a new context, with new data, without any platform dependency.</span>
+      <span lang="fr">Dans les deux cas, ce qui circule n'est pas un screenshot ou un export — c'est la connaissance procédurale de <em>comment faire la chose</em>. La recette (skill) transporte tout ce qu'il faut pour reproduire le résultat dans un nouveau contexte, avec de nouvelles données, sans aucune dépendance de plateforme.</span>
+    </div>
+
+    <div class="section-divider">V</div>
+
+    <!-- ═══ COMPARISON -->
+    <h2>
+      <span lang="en">How HyperSkills compare to existing approaches</span>
+      <span lang="fr">Comparaison avec les approches existantes</span>
+    </h2>
+
+    <div lang="en">
+      <p>Every existing approach to sharing AI knowledge has a platform dependency built in. HyperSkills removes it.</p>
+    </div>
+
+    <div lang="fr">
+      <p>Toutes les approches existantes de partage de connaissance IA ont une dépendance de plateforme intégrée. HyperSkills la supprime.</p>
+    </div>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th lang="en">Approach</th>
+          <th lang="fr">Approche</th>
+          <th lang="en">Self-contained</th>
+          <th lang="fr">Autoportant</th>
+          <th lang="en">No platform</th>
+          <th lang="fr">Sans plateforme</th>
+          <th lang="en">Versionable</th>
+          <th lang="fr">Versionnable</th>
+          <th lang="en">Agent-executable</th>
+          <th lang="fr">Exécutable agent</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="hl">
+          <td><strong>HyperSkill URL</strong></td>
+          <td><span class="tag tag-green">Yes</span></td>
+          <td><span class="tag tag-green">Yes</span></td>
+          <td><span class="tag tag-green"><span lang="en">Hash chain</span><span lang="fr">Chaîne de hash</span></span></td>
+          <td><span class="tag tag-green">Yes</span></td>
+        </tr>
+        <tr>
+          <td lang="en">GitHub Gist / file</td>
+          <td lang="fr">GitHub Gist / fichier</td>
+          <td><span class="tag tag-red">No</span></td>
+          <td><span class="tag tag-orange">GitHub</span></td>
+          <td><span class="tag tag-green">Git</span></td>
+          <td><span class="tag tag-red">No</span></td>
+        </tr>
+        <tr>
+          <td lang="en">Claude Artifacts</td>
+          <td lang="fr">Claude Artifacts</td>
+          <td><span class="tag tag-red">No</span></td>
+          <td><span class="tag tag-red">claude.ai</span></td>
+          <td><span class="tag tag-red">No</span></td>
+          <td><span class="tag tag-orange"><span lang="en">Partial</span><span lang="fr">Partiel</span></span></td>
+        </tr>
+        <tr>
+          <td lang="en">MCP server resource</td>
+          <td lang="fr">Ressource serveur MCP</td>
+          <td><span class="tag tag-red">No</span></td>
+          <td><span class="tag tag-red"><span lang="en">Server required</span><span lang="fr">Serveur requis</span></span></td>
+          <td><span class="tag tag-orange"><span lang="en">Depends</span><span lang="fr">Dépend</span></span></td>
+          <td><span class="tag tag-green">Yes</span></td>
+        </tr>
+        <tr>
+          <td lang="en">Agent Skills folder</td>
+          <td lang="fr">Dossier Agent Skills</td>
+          <td><span class="tag tag-red">No</span></td>
+          <td><span class="tag tag-orange"><span lang="en">File system</span><span lang="fr">Système de fichiers</span></span></td>
+          <td><span class="tag tag-green">Git</span></td>
+          <td><span class="tag tag-green">Yes</span></td>
+        </tr>
+        <tr>
+          <td lang="en">Prompt library (SaaS)</td>
+          <td lang="fr">Bibliothèque de prompts (SaaS)</td>
+          <td><span class="tag tag-red">No</span></td>
+          <td><span class="tag tag-red"><span lang="en">Vendor lock-in</span><span lang="fr">Enfermement vendeur</span></span></td>
+          <td><span class="tag tag-orange"><span lang="en">If available</span><span lang="fr">Si disponible</span></span></td>
+          <td><span class="tag tag-orange"><span lang="en">Partial</span><span lang="fr">Partiel</span></span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div lang="en">
+      <p>The closest relative to a hyperskill is an <a href="https://agentskills.io" target="_blank">Agent Skills</a> folder — a directory of instructions and scripts that agents can load. Agent Skills is the recommended format for the <em>content</em> of a hyperskill. But a folder requires a file system or a repository. A hyperskill is the URL-portable version: the same knowledge, no infrastructure required.</p>
+    </div>
+
+    <div lang="fr">
+      <p>Le plus proche parent d'une hyper-recette (hyperskill) est un dossier <a href="https://agentskills.io" target="_blank">Agent Skills</a> — un répertoire d'instructions et de scripts que les agents peuvent charger. Agent Skills est le format recommandé pour le <em>contenu</em> d'une hyper-recette (hyperskill). Mais un dossier nécessite un système de fichiers ou un dépôt. Une hyperskill en est la version portable par URL : la même connaissance, sans infrastructure requise.</p>
+    </div>
+
+    <div class="section-divider">VI</div>
+
+    <!-- ═══ IMPLEMENT -->
+    <h2>
+      <span lang="en">Building with HyperSkills</span>
+      <span lang="fr">Construire avec HyperSkills</span>
+    </h2>
+
+    <div lang="en">
+      <p>The spec is at <a href="https://hyperskills.net" target="_blank">hyperskills.net</a>, which also includes a live encoder/decoder. Any application can add hyperskill support with a few dozen lines of code: read the <code>?hs=</code> parameter on page load, base64-decode it (and decompress if prefixed <code>gz.</code> or <code>br.</code>), parse the content, and display or execute it. Encoding goes the other direction: serialise, compress if large, base64-encode, append to the current URL.</p>
+      <p>If you don't want to reimplement the format yourself, the reference implementation is published on npm as <a href="https://www.npmjs.com/package/hyperskills" target="_blank"><code>hyperskills</code></a> (source: <a href="https://github.com/jeanbaptiste/hyperskills" target="_blank">github.com/jeanbaptiste/hyperskills</a>, licensed CC-BY-SA-4.0 — Copyright CERI SAS). It is a small zero-dependency ES module that runs in any modern browser and in Node.js ≥ 18. It exposes the whole format in a handful of functions: <code>encode(sourceUrl, content, { compress })</code>, <code>decode(urlOrParam)</code>, <code>hash(sourceUrl, content, previousHash)</code>, <code>createVersion()</code>, plus <code>sign()</code>, <code>verify()</code> and <code>generateKeyPair()</code> for Ed25519 signatures, and <code>getHsParam()</code> to read the current browser URL. Install it the usual way:</p>
+    </div>
+
+    <div lang="fr">
+      <p>La spec est sur <a href="https://hyperskills.net" target="_blank">hyperskills.net</a>, qui inclut aussi un encodeur/décodeur interactif. N'importe quelle application peut ajouter le support des hyper-recettes (hyperskills) en quelques dizaines de lignes de code : lire le paramètre <code>?hs=</code> au chargement de la page, décoder le base64 (et décompresser si préfixe <code>gz.</code> ou <code>br.</code>), parser le contenu, l'afficher ou l'exécuter. L'encodage va dans l'autre sens : sérialiser, compresser si volumineux, encoder en base64, appender à l'URL courante.</p>
+      <p>Si vous ne voulez pas réimplémenter le format vous-même, l'implémentation de référence est publiée sur npm sous le nom <a href="https://www.npmjs.com/package/hyperskills" target="_blank"><code>hyperskills</code></a> (sources : <a href="https://github.com/jeanbaptiste/hyperskills" target="_blank">github.com/jeanbaptiste/hyperskills</a>, licence CC-BY-SA-4.0 — Copyright CERI SAS). C'est un petit module ES sans dépendance qui fonctionne dans n'importe quel navigateur moderne et dans Node.js ≥ 18. Il expose tout le format en une poignée de fonctions : <code>encode(sourceUrl, content, { compress })</code>, <code>decode(urlOrParam)</code>, <code>hash(sourceUrl, content, previousHash)</code>, <code>createVersion()</code>, plus <code>sign()</code>, <code>verify()</code> et <code>generateKeyPair()</code> pour les signatures Ed25519, et <code>getHsParam()</code> pour lire l'URL courante du navigateur. Installation classique :</p>
+    </div>
+
+<pre><span class="cm"><span lang="en"># Install from npm</span><span lang="fr"># Installation depuis npm</span></span>
+npm install hyperskills
+
+<span class="cm"><span lang="en"># Encode a skill, then decode it back</span><span lang="fr"># Encoder une recette (skill), puis la décoder</span></span>
+<span class="kw">import</span> { encode, decode, hash } <span class="kw">from</span> <span class="str">'hyperskills'</span>;
+
+<span class="kw">const</span> sourceUrl = <span class="str">'https://tricoteuses.fr/recettes/analyser_amendements'</span>;
+<span class="kw">const</span> content   = <span class="str">'-- SQL recipe...\nSELECT * FROM assemblee.amendements;'</span>;
+
+<span class="cm"><span lang="en">// gzip compression for larger skills</span><span lang="fr">// compression gzip pour les recettes (skills) volumineuses</span></span>
+<span class="kw">const</span> url = <span class="kw">await</span> <span class="fn">encode</span>(sourceUrl, content, { compress: <span class="str">'gz'</span> });
+<span class="cm"><span lang="en">// → https://tricoteuses.fr/recettes/analyser_amendements?hs=gz.H4sIAA...</span><span lang="fr">// → https://tricoteuses.fr/recettes/analyser_amendements?hs=gz.H4sIAA...</span></span>
+
+<span class="kw">const</span> { url: src, content: skill } = <span class="kw">await</span> <span class="fn">decode</span>(url);
+<span class="kw">const</span> h = <span class="kw">await</span> <span class="fn">hash</span>(src, skill);  <span class="cm"><span lang="en">// SHA-256(sourceUrl + content)</span><span lang="fr">// SHA-256(url_source + contenu)</span></span></pre>
+
+    <div lang="en">
+      <p>Below is what the decoding path looks like when you reimplement it by hand, without the package — useful to understand what the <code>hyperskills</code> module is actually doing, and to port the format to languages other than JavaScript:</p>
+    </div>
+
+    <div lang="fr">
+      <p>Voici à quoi ressemble le chemin de décodage quand on le réimplémente à la main, sans le package — utile pour comprendre ce que fait réellement le module <code>hyperskills</code>, et pour porter le format vers d'autres langages que JavaScript :</p>
+    </div>
+
+<pre><span class="cm"><span lang="en">// Minimal decode — works in any browser</span><span lang="fr">// Décodage minimal — fonctionne dans n'importe quel navigateur</span></span>
+<span class="kw">async function</span> <span class="fn">decodeHyperSkill</span>(url) {
+  <span class="kw">const</span> param = <span class="kw">new</span> <span class="fn">URL</span>(url).searchParams.<span class="fn">get</span>(<span class="str">'hs'</span>);
+  <span class="kw">if</span> (!param) <span class="kw">return null</span>;
+
+  <span class="kw">if</span> (param.<span class="fn">startsWith</span>(<span class="str">'gz.'</span>)) {
+    <span class="cm"><span lang="en">// gzip-compressed skill</span><span lang="fr">// skill compressée en gzip</span></span>
+    <span class="kw">const</span> binary = Uint8Array.<span class="fn">from</span>(<span class="fn">atob</span>(param.<span class="fn">slice</span>(<span class="num">3</span>)), c => c.<span class="fn">charCodeAt</span>(<span class="num">0</span>));
+    <span class="kw">const</span> ds = <span class="kw">new</span> <span class="fn">DecompressionStream</span>(<span class="str">'gzip'</span>);
+    ds.writable.<span class="fn">getWriter</span>().<span class="fn">write</span>(binary);
+    <span class="kw">return await new</span> <span class="fn">Response</span>(ds.readable).<span class="fn">text</span>();
+  }
+
+  <span class="kw">return</span> <span class="fn">decodeURIComponent</span>(<span class="fn">escape</span>(<span class="fn">atob</span>(param)));
+}</pre>
+
+    <div lang="en">
+      <p><strong><a href="https://github.com/jeanbaptiste/webmcp-auto-ui" target="_blank">webmcp-auto-ui</a></strong> is one example of a complete implementation built directly on top of the <code>hyperskills</code> package. It is a monorepo of browser apps that compose UIs dynamically from any MCP server: an LLM reads the available tools, fetches data, then calls <code>render_*</code> tools to assemble a dashboard from typed blocks — stat cards, tables, charts, timelines, window manager layouts. Each block auto-registers as a live WebMCP tool that agents can read and update. Two of its apps are worth looking at specifically because they show the two sides of the hyperskill lifecycle:</p>
+      <p>The <strong>viewer</strong> app is a dedicated frontend for a single hyperskill URL. Paste any <code>?hs=</code> link and it decodes the content, shows it in context, lets you edit it inline, recomputes the SHA-256, chains the new hash to the previous one, and gives you back a new URL to share. Diff, versioning and SHA-256 chain are all handled client-side — no backend, no account. It is the clearest existing illustration of a hyperskill as a self-contained editable artifact.</p>
+      <p>The <strong>composer</strong> (also called <em>flex</em>) goes the other direction. You connect it to any MCP server, ask a question in natural language, and an agent loop composes a live dashboard from the typed blocks. Once the dashboard looks right, one click exports the whole composition — block tree, data bindings, MCP server URL, LLM context — as a single hyperskill URL. A colleague opens the link, gets the same composition wired to their own data, edits it, and reshares a new URL. What circulates between people is not a screenshot or a dump: it is the full procedural recipe to rebuild the view.</p>
+    </div>
+
+    <div lang="fr">
+      <p><strong><a href="https://github.com/jeanbaptiste/webmcp-auto-ui" target="_blank">webmcp-auto-ui</a></strong> est un exemple d'implémentation complète construite directement sur le package <code>hyperskills</code>. C'est un monorepo d'applications navigateur qui composent des UI dynamiquement à partir de n'importe quel serveur MCP : un LLM lit les outils disponibles, récupère des données, puis appelle des outils <code>render_*</code> pour assembler un tableau de bord depuis des blocs typés — stat cards, tableaux, graphiques, timelines, gestionnaires de fenêtres. Chaque bloc s'auto-enregistre comme un outil WebMCP vivant que les agents peuvent lire et mettre à jour. Deux de ses applications méritent qu'on s'y attarde parce qu'elles illustrent les deux côtés du cycle de vie d'une hyper-recette (hyperskill) :</p>
+      <p>L'application <strong>viewer</strong> est un frontend dédié à une seule URL hyperskill. Collez n'importe quel lien <code>?hs=</code> et elle décode le contenu, l'affiche en contexte, permet de l'éditer directement, recalcule le SHA-256, enchaîne le nouveau hash au précédent, et renvoie une nouvelle URL à partager. Le diff, le versionnage et la chaîne SHA-256 sont tous gérés côté client — pas de backend, pas de compte. C'est l'illustration la plus claire aujourd'hui d'une hyper-recette (hyperskill) comme artefact éditable autoportant.</p>
+      <p>Le <strong>composer</strong> (aussi appelé <em>flex</em>) va dans l'autre sens. On le connecte à n'importe quel serveur MCP, on pose une question en langage naturel, et une boucle agent compose un tableau de bord vivant depuis les blocs typés. Une fois que le dashboard est satisfaisant, un clic exporte toute la composition — arbre de blocs, bindings de données, URL du serveur MCP, contexte LLM — sous forme d'une unique URL hyperskill. Un collègue ouvre le lien, obtient la même composition branchée sur ses propres données, la modifie, et repartage une nouvelle URL. Ce qui circule entre les personnes n'est pas une capture d'écran ni un export : c'est la recette procédurale complète pour reconstruire la vue.</p>
+    </div>
+
+    <div class="section-divider">VII</div>
+
+    <!-- ═══ BERNE -->
+    <h2>
+      <span lang="en">Skills, hyperskills and the Berne Convention</span>
+      <span lang="fr">Recettes, hyper-recettes et Convention de Berne</span>
+    </h2>
+
+    <div lang="en">
+      <p>A natural question, once skills start circulating as URLs, is: who owns them? The answer sits more clearly in copyright law than most people assume. Skills and recipes are <em>processes</em>: methods, know-how, sequences of operations. The <a href="https://en.wikipedia.org/wiki/Berne_Convention" target="_blank">Berne Convention</a> — the international treaty that harmonises copyright across most of the world — protects works of the mind in their <em>expression</em>, not the ideas or the processes they describe. A skill describes a process: as a rule, it sits outside copyright. Only a particularly original formulation — specific wording, a distinctive narrative, creative prose around the recipe — could attract protection, and only for that exact expression. Sharing a skill is sharing common knowledge.</p>
+      <p>This is what makes the hyperskill format coherent with what it carries. A URL that encodes a procedure is a vehicle for something that was already, by its nature, closer to a public good than to a private work. The cryptographic traceability (SHA-256 chain, Ed25519 signatures) is about <em>authorship attribution and integrity</em>, not about ownership: it tells you who wrote this version and that nothing was altered, without claiming any exclusive right over the procedure itself.</p>
+    </div>
+
+    <div lang="fr">
+      <p>Une question naturelle, dès que les recettes (skills) commencent à circuler sous forme d'URLs, est : à qui appartiennent-elles ? La réponse est plus claire dans le droit d'auteur que ce qu'on imagine souvent. Les compétences et recettes sont des <em>processus</em> : des méthodes, du savoir-faire, des suites d'opérations. La <a href="https://fr.wikipedia.org/wiki/Convention_de_Berne_pour_la_protection_des_%C5%93uvres_litt%C3%A9raires_et_artistiques" target="_blank">Convention de Berne</a> — le traité international qui harmonise le droit d'auteur dans la majorité du monde — protège les œuvres de l'esprit dans leur <em>expression</em>, pas les idées ni les processus. Une compétence décrit un processus : elle échappe en général au droit d'auteur. Seule une formulation particulièrement originale — un phrasé spécifique, une narration distinctive, de la prose créative autour de la recette — pourrait être protégée, et uniquement pour cette expression précise. Partager une compétence, c'est partager un savoir commun.</p>
+      <p>C'est ce qui rend le format hyperskill cohérent avec ce qu'il transporte. Une URL qui encode une procédure est un véhicule pour quelque chose qui, par nature, était déjà plus proche d'un bien public que d'une œuvre privée. La traçabilité cryptographique (chaîne SHA-256, signatures Ed25519) concerne <em>l'attribution de l'auteur et l'intégrité</em>, pas la propriété : elle dit qui a écrit cette version et que rien n'a été altéré, sans revendiquer de droit exclusif sur la procédure elle-même.</p>
+    </div>
+
+    <div class="info-box">
+      <strong lang="en">Try it now</strong>
+      <strong lang="fr">Essayer maintenant</strong>
+      <span lang="en"><a href="https://hyperskills.net" target="_blank">hyperskills.net</a> includes a live encoder and decoder. Paste any text content, get a hyperskill URL. Paste a hyperskill URL, get the decoded content. The <a href="https://tricoteuses.fr/recettes/analyser_amendements" target="_blank">analyser_amendements</a> recipe from tricoteuses.fr is a real production example.</span>
+      <span lang="fr"><a href="https://hyperskills.net" target="_blank">hyperskills.net</a> inclut un encodeur et décodeur interactif. Coller n'importe quel contenu textuel, obtenir une URL hyperskill. Coller une URL hyperskill, obtenir le contenu décodé. La recette <a href="https://tricoteuses.fr/recettes/analyser_amendements" target="_blank">analyser_amendements</a> de tricoteuses.fr est un vrai exemple de production.</span>
+    </div>
+
+  </main>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <h4>
+        <span lang="en">HyperSkill format</span>
+        <span lang="fr">Format HyperSkill</span>
+      </h4>
+      <ul>
+        <li>
+          <span lang="en">Encoding</span><span lang="fr">Encodage</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">base64 · gz. · br.</span>
+        </li>
+        <li>
+          <span lang="en">Content</span><span lang="fr">Contenu</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">MD · SQL · YAML · HTML…</span>
+        </li>
+        <li>
+          <span lang="en">Hash</span><span lang="fr">Hash</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">SHA-256(url+content)</span>
+        </li>
+        <li>
+          <span lang="en">Chaining</span><span lang="fr">Chaînage</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">previousHash</span>
+        </li>
+        <li>
+          <span lang="en">Signature</span><span lang="fr">Signature</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">Ed25519 (optional)</span>
+        </li>
+        <li>
+          <span lang="en">License</span><span lang="fr">Licence</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">free (per skill)</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <h4>
+        <span lang="en">Browser size limits · ?hs=</span>
+        <span lang="fr">Limites navigateur · ?hs=</span>
+      </h4>
+      <ul>
+        <li><span>Chrome / Edge</span><span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">~32 000 chars</span></li>
+        <li><span>Firefox</span><span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">~65 000 chars</span></li>
+        <li><span>Safari</span><span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">~80 000 chars</span></li>
+        <li><span>Android</span><span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">~8 000 chars</span></li>
+        <li>
+          <span lang="en">gz. · 250-500 KB raw</span>
+          <span lang="fr">gz. · 250-500 Ko brut</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">≤ 32 000</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <h4>
+        <span lang="en">Implementations</span>
+        <span lang="fr">Implémentations</span>
+      </h4>
+      <ul>
+        <li>
+          <a href="https://www.npmjs.com/package/hyperskills" target="_blank">npm: hyperskills</a>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">JS · ref</span>
+        </li>
+        <li>
+          <a href="https://tricoteuses.fr" target="_blank">tricoteuses.fr</a>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">SQL · civic</span>
+        </li>
+        <li>
+          <a href="https://github.com/jeanbaptiste/webmcp-auto-ui" target="_blank">webmcp-auto-ui</a>
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted)">UI · MCP</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <h4>
+        <span lang="en">Related</span>
+        <span lang="fr">Voir aussi</span>
+      </h4>
+      <ul>
+        <li><a href="https://hyperskills.net" target="_blank">hyperskills.net</a><span class="status-dot live"></span></li>
+        <li><a href="https://agentskills.io" target="_blank">agentskills.io</a><span class="status-dot live"></span></li>
+        <li><a href="https://skillpedia.eu" target="_blank">skillpedia.eu</a><span class="status-dot live"></span></li>
+        <li><a href="https://modelcontextprotocol.io" target="_blank">MCP spec</a><span class="status-dot live"></span></li>
+        <li><a href="https://webmachinelearning.github.io/webmcp/" target="_blank">WebMCP W3C</a><span class="status-dot draft"></span></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <h4>
+        <span lang="en">Site license</span>
+        <span lang="fr">Licence du site</span>
+      </h4>
+      <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">
+        CC-BY-SA-4.0 · CERI SAS — <a href="https://hyperskills.net" target="_blank">hyperskills.net</a>
+      </p>
+    </div>
+
+  </aside>
+</div>
+
+<footer>
+  <span>
+    <span lang="en">Web & AI — Open formats · hyperskills.net</span>
+    <span lang="fr">Web & IA — Formats ouverts · hyperskills.net</span>
+  </span>
+  <span>CC-BY-SA-4.0 · CERI SAS · 2026</span>
+</footer>
+
+<script>
+  function setLang(lang) {
+    document.body.className = 'lang-' + lang;
+    document.documentElement.lang = lang;
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent === lang.toUpperCase());
+    });
+  }
+</script>
+
+</body>
+</html>
