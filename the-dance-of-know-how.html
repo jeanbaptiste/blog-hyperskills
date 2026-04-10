@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Dance of Know-how in the Age of AI</title>
+<meta name="description" content="Hyper-recipes as the medium of the post-LLM web. Skills travel as URLs, every layer stays legible. An essay by @jeanbaptiste with Emmanuel Raviart.">
+<meta name="author" content="@jeanbaptiste">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://blog.hyperskills.net/the-dance-of-know-how.html">
+<meta property="og:title" content="The Dance of Know-how in the Age of AI">
+<meta property="og:description" content="Hyper-recipes as the medium of the post-LLM web. Skills travel as URLs, every layer stays legible.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.hyperskills.net/the-dance-of-know-how.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@jeanbaptiste">
+<meta name="twitter:creator" content="@jeanbaptiste">
+<meta name="twitter:title" content="The Dance of Know-how in the Age of AI">
+<meta name="twitter:description" content="Hyper-recipes as the medium of the post-LLM web. An essay by @jeanbaptiste.">
+<style>
+  :root, [data-theme="light"] {
+    --bg: #faf8f3;
+    --fg: #1a1a1a;
+    --muted: #666;
+    --rule: #d4cfc0;
+    --link: #8b2e1f;
+    --code-bg: #f0ede3;
+    --accent: #8b2e1f;
+  }
+  [data-theme="dark"] {
+    --bg: #1a1a1a;
+    --fg: #e8e4d8;
+    --muted: #999;
+    --rule: #3a3a3a;
+    --link: #d4846b;
+    --code-bg: #252118;
+    --accent: #d4846b;
+  }
+  .controls {
+    position: fixed; top: 1.2em; right: 1.2em; z-index: 100;
+    display: flex; gap: 0.5em; align-items: center;
+    background: var(--bg); border: 1px solid var(--rule);
+    padding: 0.4em 0.6em; border-radius: 4px;
+    font-family: inherit; font-size: 0.8em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .controls button {
+    background: none; border: none; color: var(--muted);
+    font: inherit; cursor: pointer; padding: 0.3em 0.5em;
+    border-radius: 3px; transition: all 0.15s;
+  }
+  .controls button:hover { color: var(--fg); background: var(--rule); }
+  .controls button.active { color: var(--fg); font-weight: bold; }
+  .controls .sep { color: var(--rule); }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 18px; line-height: 1.7;
+    max-width: 660px; margin: 0 auto; padding: 3em 1.5em 6em;
+    transition: background 0.2s, color 0.2s;
+  }
+  header { border-bottom: 1px solid var(--rule); padding-bottom: 1.8em; margin-bottom: 2.8em; }
+  h1 { font-size: 1.9em; font-weight: normal; margin: 0 0 0.3em; letter-spacing: -0.01em; line-height: 1.15; }
+  .subtitle { color: var(--muted); font-style: italic; font-size: 0.95em; margin: 0.4em 0 0.5em; }
+  .author { font-size: 0.95em; margin: 0.3em 0 0.4em; color: var(--fg); }
+  .author a { color: var(--fg); text-decoration: none; border-bottom: 1px solid var(--rule); }
+  .author a:hover { border-bottom-color: var(--link); color: var(--link); }
+  .meta { font-size: 0.78em; color: var(--muted); margin-top: 1em; }
+  article p { margin: 0 0 1.25em; hyphens: auto; text-align: justify; }
+  article p:first-of-type::first-line { font-variant: small-caps; letter-spacing: 0.05em; }
+  hr { border: none; text-align: center; margin: 2.5em 0; }
+  hr::before { content: "❦"; color: var(--muted); font-size: 1.2em; }
+  h2 { font-size: 1.1em; font-weight: normal; font-style: italic; color: var(--muted); margin-top: 2.8em; margin-bottom: 0.8em; }
+  pre {
+    font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.78em;
+    line-height: 1.55; background: var(--code-bg); padding: 1.4em;
+    border-left: 3px solid var(--accent); overflow-x: auto; white-space: pre-wrap;
+    margin: 1.5em 0;
+  }
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.85em;
+    background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 2px;
+  }
+  a { color: var(--link); text-decoration: none; border-bottom: 1px dotted var(--rule); }
+  a:hover { border-bottom-color: var(--link); }
+
+  /* SVG illustrations */
+  .figure {
+    margin: 2.5em 0;
+    text-align: center;
+  }
+  .figure svg {
+    max-width: 100%;
+    height: auto;
+  }
+  .figure figcaption {
+    font-size: 0.78em;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 0.8em;
+  }
+
+  /* Screenshot figure */
+  .screenshot-figure {
+    margin: 2.5em -1em;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .screenshot-figure img {
+    width: 100%;
+    display: block;
+  }
+  .screenshot-caption {
+    font-size: 0.78em;
+    color: var(--muted);
+    font-style: italic;
+    padding: 0.7em 1em;
+    border-top: 1px solid var(--rule);
+    background: var(--code-bg);
+  }
+
+  .refs { font-size: 0.85em; color: var(--muted); margin-top: 3em; border-top: 1px solid var(--rule); padding-top: 2em; }
+  .refs a { color: var(--link); }
+  .refs ul { padding-left: 1.2em; }
+  .refs li { margin-bottom: 0.5em; }
+  footer { margin-top: 4em; padding-top: 1.5em; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.8em; text-align: center; }
+
+  .figure a:hover svg { opacity: 0.9; }
+  .figure a svg { cursor: pointer; transition: opacity 0.15s; }
+
+  [lang-content] { display: none; }
+  [lang-content].visible { display: block; }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button onclick="setLang('fr')" id="btn-fr" class="active">FR</button>
+  <span class="sep">·</span>
+  <button onclick="setLang('en')" id="btn-en">EN</button>
+  <span class="sep">|</span>
+  <button onclick="toggleTheme()" id="btn-theme" title="Toggle theme">☾</button>
+</div>
+
+<!-- ============================================================ FR ============================================================ -->
+<div lang-content="fr" class="visible">
+
+<header>
+  <h1>La danse des savoir-faire à l'ère de l'IA</h1>
+  <p class="author"><a href="https://github.com/jeanbaptiste">@jeanbaptiste</a></p>
+  <p class="subtitle">Les hyper-recettes comme medium du web post-LLM.</p>
+  <p class="meta">Essai · Avril 2026 · ~45 min</p>
+</header>
+
+<article>
+
+<p>Je veux décrire ici une chose qui n'existe pas encore et qui devrait exister.</p>
+
+<p>Depuis trois ans, l'industrie a posé une seule réponse à la question de la bonne forme d'interaction avec un LLM. Un chatbot. Un rectangle de texte dans une fenêtre. Vous tapez, l'agent répond. Parfois il appelle un outil derrière le rideau et reformule le résultat. Dans tous les cas, c'est un processus dans une boîte et vous restez de l'autre côté.</p>
+
+<p>On regarde un ballet. On ne danse pas.</p>
+
+<p>Le web de 1994 avait le même problème avant Mosaic (le premier browser web). Gopher fonctionnait. Personne ne s'en souvient parce que ce qui est venu après était plus pertinent. Le chatbot dans sa forme d'aujourd'hui est le Gopher du web post-LLM. Il fonctionnera quelques années. Puis quelque chose de différent apparaîtra.</p>
+
+<p>Je veux que ce nouveau paradigme soit un commun, pas une rente. C'est pour ça que j'écris ce texte.</p>
+
+<h2>1. Une scène qui contient tout le problème</h2>
+
+<p>Une assistante parlementaire à Paris. Son député siège à la commission des Affaires sociales. Demain matin ils examinent un projet de loi sur le handicap. Avant 18 heures elle doit produire un document qui montre quatre choses : qui a déposé quels amendements sur ce sujet en six mois, comment chaque groupe a voté, quelles associations ont été auditionnées, et une comparaison avec les trois législatures précédentes.</p>
+
+<p>Elle a trois options. Tout à la main — quatre heures, tableau illisible. Un outil propriétaire — plusieurs milliers d'euros par an, elle voit ce que le fournisseur a décidé de lui montrer. Ou un chatbot — le tableau sort propre, mais elle ne peut pas le modifier, ne peut pas le partager en interactif, et ne peut pas vérifier d'où viennent les chiffres.</p>
+
+<p>Aucune des trois ne suffit. Et elles ratent toutes le problème pour la même raison.</p>
+
+<p>Le vrai problème n'est pas comment répondre à la question. C'est comment produire à plusieurs un objet qui survivra à la conversation. Un objet qu'un humain a pensé, qu'un agent a aidé à composer, qu'un autre humain pourra ouvrir, modifier, archiver, vérifier. Ce qui manque n'est pas une IA plus intelligente. C'est <em>l'objet</em>.</p>
+
+<h2>2. L'objet qui manque</h2>
+
+<p>Je l'appelle une hyper-recette. Voici ses propriétés.</p>
+
+<p>Elle contient un état composé. Un ou plusieurs widgets, chacun lié à une source de données, dans un certain ordre, avec certaines interactions possibles entre eux. Pas une conversation. Un état.</p>
+
+<p>Elle est adressée par son contenu. Deux hyper-recettes identiques ont la même adresse. Si vous changez un caractère, l'adresse change. C'est ce que git fait pour les commits, IPFS pour les fichiers.</p>
+
+<p>Elle tient dans une URL. Littéralement. Une chaîne de caractères que vous envoyez par SMS, que vous collez dans un mail. Le lien est l'objet, encodé. Quand vous cliquez, votre navigateur décode et reconstruit l'état. Pas de serveur d'hyper-recettes. Pas de base de données.</p>
+
+<p>Elle se modifie. Vous recevez l'hyper-recette d'un collègue. Vous l'ouvrez. Vous changez un widget. Vous figez une nouvelle version. La nouvelle version connaît l'ancienne par son hash. La chaîne se trace.</p>
+
+<p>Elle survit. À son auteur. À son serveur. À l'outil qui l'a composée. Comme une page HTML statique de 1996, elle s'ouvrira dans vingt ans à condition que les sources de données qu'elle référence soient encore là. Cet objet n'est pas neuf. C'est ce que Ted Nelson appelait un objet hypertextuel en 1965.</p>
+
+<!-- SVG 1: Hyper-recipe anatomy -->
+<figure class="figure">
+<a href="https://hyperskills.net" target="_blank" rel="noopener" title="Ouvrir une hyper-recette réelle sur hyperskills.net" style="display:block;border:none;">
+<svg viewBox="0 0 580 320" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+  <defs>
+    <style>
+      .svg-bg { fill: none; }
+      .svg-box { fill: none; stroke: #8b2e1f; stroke-width: 1.5; rx: 3; }
+      .svg-label { font-family: "SF Mono", Menlo, monospace; font-size: 11px; fill: #8b2e1f; }
+      .svg-text { font-family: "Iowan Old Style", Georgia, serif; font-size: 12px; fill: #444; }
+      .svg-title { font-family: "Iowan Old Style", Georgia, serif; font-size: 11px; fill: #888; font-style: italic; }
+      .svg-arrow { stroke: #ccc; stroke-width: 1.2; fill: none; marker-end: url(#arr); }
+      .svg-hash { font-family: "SF Mono", Menlo, monospace; font-size: 9px; fill: #999; }
+    </style>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#bbb"/>
+    </marker>
+  </defs>
+  <!-- URL bar — cliquable, pointe vers hyperskills.net -->
+  <rect x="20" y="20" width="540" height="34" rx="4" fill="none" stroke="#8b2e1f" stroke-width="1.2" stroke-dasharray="4,2" opacity="0.6"/>
+  <text x="34" y="42" font-family="'SF Mono', monospace" font-size="10" fill="#8b2e1f" opacity="0.8">hyperskills.net</text>
+  <text x="128" y="42" font-family="'SF Mono', monospace" font-size="10" fill="#999">/?hs=eyJ3aWRnZXRzIjpb…</text>
+  <text x="490" y="42" font-family="Georgia, serif" font-size="9" fill="#8b2e1f" font-style="italic">↗</text>
+
+  <!-- Widgets -->
+  <rect x="20" y="74" width="160" height="90" rx="3" fill="none" stroke="#8b2e1f" stroke-width="1.2"/>
+  <text x="30" y="92" font-family="Georgia, serif" font-size="11" fill="#888" font-style="italic">widget: profile</text>
+  <text x="30" y="112" font-family="'SF Mono', monospace" font-size="10" fill="#555">actor_uid: PA722142</text>
+  <text x="30" y="128" font-family="'SF Mono', monospace" font-size="10" fill="#555">source: Moulineuse</text>
+  <text x="30" y="144" font-family="'SF Mono', monospace" font-size="10" fill="#555">recipe: parl-profile</text>
+
+  <rect x="200" y="74" width="160" height="90" rx="3" fill="none" stroke="#8b2e1f" stroke-width="1.2"/>
+  <text x="210" y="92" font-family="Georgia, serif" font-size="11" fill="#888" font-style="italic">widget: chart</text>
+  <text x="210" y="112" font-family="'SF Mono', monospace" font-size="10" fill="#555">type: bar-horizontal</text>
+  <text x="210" y="128" font-family="'SF Mono', monospace" font-size="10" fill="#555">source: Moulineuse</text>
+  <text x="210" y="144" font-family="'SF Mono', monospace" font-size="10" fill="#555">listens: timeline.*</text>
+
+  <rect x="380" y="74" width="180" height="90" rx="3" fill="none" stroke="#8b2e1f" stroke-width="1.2"/>
+  <text x="390" y="92" font-family="Georgia, serif" font-size="11" fill="#888" font-style="italic">widget: timeline</text>
+  <text x="390" y="112" font-family="'SF Mono', monospace" font-size="10" fill="#555">range: 2022–2026</text>
+  <text x="390" y="128" font-family="'SF Mono', monospace" font-size="10" fill="#555">source: Légifrance</text>
+  <text x="390" y="144" font-family="'SF Mono', monospace" font-size="10" fill="#555">emits: date-selected</text>
+
+  <!-- Event bus -->
+  <line x1="360" y1="136" x2="382" y2="136" class="svg-arrow" stroke="#bbb" stroke-width="1" marker-end="url(#arr)"/>
+  <text x="362" y="128" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">date-selected</text>
+
+  <!-- Hash chain -->
+  <rect x="20" y="190" width="250" height="30" rx="2" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="30" y="210" font-family="'SF Mono', monospace" font-size="10" fill="#999">hash: e3f7a2c09d4b81  (v1)</text>
+
+  <line x1="270" y1="205" x2="300" y2="205" stroke="#d4cfc0" stroke-width="1" marker-end="url(#arr)"/>
+
+  <rect x="300" y="190" width="260" height="30" rx="2" fill="none" stroke="#8b2e1f" stroke-width="1"/>
+  <text x="310" y="210" font-family="'SF Mono', monospace" font-size="10" fill="#8b2e1f">hash: 9c1a4f2e0b73d5  (v2, parent: v1)</text>
+
+  <text x="20" y="250" font-family="Georgia, serif" font-size="11" fill="#888" font-style="italic">L'artefact encode l'état, les sources, la provenance et la chaîne de versions.</text>
+  <text x="20" y="266" font-family="Georgia, serif" font-size="11" fill="#888" font-style="italic">Pas de serveur requis. Le lien est l'objet.</text>
+
+  <!-- Labels -->
+  <text x="20" y="295" font-family="'SF Mono', monospace" font-size="9" fill="#ccc">webmcp-auto-ui · flex · hyperskills.net</text>
+</svg>
+</a>
+<figcaption>Anatomie d'une hyper-recette — <a href="https://hyperskills.net" target="_blank" rel="noopener">cliquez pour en ouvrir une vraie</a>. L'URL encode l'intégralité de l'état — widgets, sources, liaisons, hash de version. Rien n'est stocké côté serveur.</figcaption>
+</figure>
+
+<h2>3. Le web qu'on a perdu sans l'avoir décidé</h2>
+
+<p>Le web des années 1994–2005 avait une propriété qu'on a oubliée. N'importe qui pouvait publier une page sur un hébergeur mutualisé à cinquante francs par mois. Quiconque dans le monde pouvait la lire sans permission. Ce web était distribué, égalitaire, persistant.</p>
+
+<p>On a perdu tout ça. Pas par décision. Par accumulation de petits choix commerciaux qui chacun semblaient raisonnables. Vous publiez une photo sur Instagram — ce n'est pas votre photo, c'est une représentation hébergée chez Meta. Pareil pour vos Google Docs, vos pages Notion, vos artifacts ChatGPT. Chaque objet que vous produisez avec un outil moderne est hébergé, pas hypertextuel. Si l'outil disparaît ou vous bannit, l'objet disparaît.</p>
+
+<p>Le web post-LLM, tel qu'il s'installe sous nos yeux, reproduit ce glissement une couche plus haut. Vos conversations avec les LLMs sont hébergées. Vos artifacts sont hébergés. Quand vous partagez un artifact à un collègue, vous partagez un lien qui pointe vers un serveur propriétaire qui peut changer demain.</p>
+
+<p>Je veux l'autre web. Pas à l'identique. Sa topologie, appliquée à un objet nouveau : la composition d'interaction entre un humain, un agent et des données.</p>
+
+<h2>4. Le test de cinq ans</h2>
+
+<p>Prenez un artifact Claude qui vous a plu. Notez la date. Dans cinq ans, sera-t-il encore accessible exactement dans l'état où vous l'avez publié ? La réponse honnête est non. L'infrastructure aura changé. Les politiques de rétention auront été révisées.</p>
+
+<p>Prenez maintenant une page HTML statique écrite en 1996. Dans presque tous les cas, elle s'ouvre aujourd'hui exactement comme à l'époque. Pas parce que l'infrastructure a été préservée — l'infrastructure est morte. Elle s'ouvre parce que l'objet porte tout ce dont il a besoin pour se rendre.</p>
+
+<p>Cette autosuffisance définit l'hypertexte. Pas la présence de liens. Pas le formatage. La capacité d'un objet à exister sans son serveur d'origine. Une hyper-recette est une page HTML de 2026 enrichie d'une connexion à des données et à un agent. Le reste découle de là.</p>
+
+<h2>5. Pourquoi maintenant</h2>
+
+<p>Il manquait deux ingrédients. Ils sont arrivés ensemble en 2024–2026.</p>
+
+<p>Le premier est le Model Context Protocol, ou MCP. Anthropic l'a publié fin 2024. Du JSON-RPC sur HTTP, une quinzaine de méthodes. Sa spec tient en quelques pages. Son importance n'est pas dans la technique — elle est dans le fait qu'il a été adopté. Des centaines de serveurs MCP publics existent aujourd'hui : données parlementaires françaises, observations d'iNaturalist, archives Hacker News, data.gouv, Wikipedia, OpenStreetMap. Avant MCP, exposer une source de données à un agent était un travail sur-mesure. Après MCP, c'est un exercice standard.</p>
+
+<p>Le second est WebMCP. Le pendant côté navigateur. Une page web peut exposer ses composants comme des outils, de façon symétrique. Le W3C a publié un draft au printemps 2026. Chrome Canary 146 commence à l'implémenter nativement. Avec WebMCP, l'interface elle-même expose ses capacités — l'agent peut dialoguer avec l'interface de façon structurée, pas seulement afficher des résultats.</p>
+
+<p>Ces deux briques changent ce qui est possible dans une page web. Et elles sont si récentes que les bonnes abstractions au-dessus ne sont pas encore tranchées. L'industrie n'a pas décidé. C'est une fenêtre. Je veux écrire dans cette fenêtre avant qu'elle se referme.</p>
+
+<!-- SVG 2: MCP/WebMCP coordination -->
+<figure class="figure">
+<svg viewBox="0 0 580 300" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+  <defs>
+    <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#8b2e1f" opacity="0.6"/>
+    </marker>
+    <marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#ccc"/>
+    </marker>
+  </defs>
+
+  <!-- Agent box (center) -->
+  <rect x="215" y="110" width="150" height="60" rx="4" fill="none" stroke="#8b2e1f" stroke-width="1.5"/>
+  <text x="290" y="137" font-family="Georgia, serif" font-size="13" fill="#8b2e1f" text-anchor="middle">Agent LLM</text>
+  <text x="290" y="155" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">system prompt structuré</text>
+
+  <!-- MCP servers (left) -->
+  <rect x="20" y="40" width="130" height="44" rx="3" fill="none" stroke="#ccc" stroke-width="1"/>
+  <text x="85" y="59" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">Moulineuse</text>
+  <text x="85" y="74" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">données parlementaires</text>
+
+  <rect x="20" y="102" width="130" height="44" rx="3" fill="none" stroke="#ccc" stroke-width="1"/>
+  <text x="85" y="121" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">iNaturalist MCP</text>
+  <text x="85" y="136" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">observations naturelles</text>
+
+  <rect x="20" y="164" width="130" height="44" rx="3" fill="none" stroke="#ccc" stroke-width="1"/>
+  <text x="85" y="183" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">data.gouv MCP</text>
+  <text x="85" y="198" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">données publiques FR</text>
+
+  <!-- MCP arrows -->
+  <line x1="150" y1="62" x2="215" y2="128" stroke="#ccc" stroke-width="1" marker-end="url(#arr3)"/>
+  <line x1="150" y1="124" x2="215" y2="138" stroke="#ccc" stroke-width="1" marker-end="url(#arr3)"/>
+  <line x1="150" y1="186" x2="215" y2="152" stroke="#ccc" stroke-width="1" marker-end="url(#arr3)"/>
+  <text x="158" y="108" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">mcp.tools</text>
+  <text x="158" y="120" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">mcp.recipes</text>
+
+  <!-- WebMCP canvas (right) -->
+  <rect x="430" y="60" width="130" height="170" rx="3" fill="none" stroke="#8b2e1f" stroke-width="1"/>
+  <text x="495" y="82" font-family="Georgia, serif" font-size="11" fill="#8b2e1f" text-anchor="middle">Canvas WebMCP</text>
+  <!-- Mini widgets -->
+  <rect x="442" y="92" width="106" height="28" rx="2" fill="none" stroke="#d4cfc0" stroke-width="0.8"/>
+  <text x="495" y="111" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">widget: profile</text>
+  <rect x="442" y="128" width="106" height="28" rx="2" fill="none" stroke="#d4cfc0" stroke-width="0.8"/>
+  <text x="495" y="147" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">widget: chart</text>
+  <rect x="442" y="164" width="106" height="28" rx="2" fill="none" stroke="#d4cfc0" stroke-width="0.8"/>
+  <text x="495" y="183" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">widget: timeline</text>
+  <text x="495" y="218" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic" text-anchor="middle">bus d'événements</text>
+
+  <!-- WebMCP arrows -->
+  <line x1="365" y1="130" x2="430" y2="140" stroke="#8b2e1f" stroke-width="1" marker-end="url(#arr2)" stroke-dasharray="3,2"/>
+  <line x1="430" y1="155" x2="365" y2="148" stroke="#8b2e1f" stroke-width="1" marker-end="url(#arr2)" stroke-dasharray="3,2" opacity="0.5"/>
+  <text x="368" y="126" font-family="Georgia, serif" font-size="9" fill="#8b2e1f" font-style="italic">webmcp.tools</text>
+  <text x="368" y="162" font-family="Georgia, serif" font-size="9" fill="#999" font-style="italic" opacity="0.7">état → URL</text>
+
+  <!-- Human -->
+  <ellipse cx="290" cy="258" rx="14" ry="14" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="290" y="263" font-family="Georgia, serif" font-size="10" fill="#bbb" text-anchor="middle">∴</text>
+  <line x1="290" y1="170" x2="290" y2="244" stroke="#d4cfc0" stroke-width="1" stroke-dasharray="2,3"/>
+  <text x="305" y="215" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">humain</text>
+
+  <!-- Labels -->
+  <text x="20" y="265" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">mcp.* → obtenir de l'information</text>
+  <text x="20" y="278" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">webmcp.* → montrer de l'information</text>
+</svg>
+<figcaption>La symétrie MCP / WebMCP. À gauche les serveurs de données, à droite le canvas navigateur. L'agent lit à gauche, compose à droite. La structure du prompt système enseigne à l'agent l'architecture du système.</figcaption>
+</figure>
+
+<h2>6. La norme de Bellard</h2>
+
+<p>Avant de descendre dans le code, une norme de qualité. Sans norme, tout ce qui précède reste du positionnement.</p>
+
+<p>Fabrice Bellard a compris ce que <em>faire simple</em> veut dire quand faire simple pourrait être confondu avec faire moins. TinyCC est un compilateur C complet en 100 Ko. Il compile tout C89 et la majeure partie de C99. Son code généré est plus lent que celui de GCC — mais il compile le même langage. Il ne dit pas <em>je ne supporte pas les unions</em>. QuickJS implémente l'intégralité d'ES2023 et passe test262 à plus de 99%. Ce qu'il perd par rapport à V8 est la vitesse sur les boucles chaudes. Il ne dit pas <em>j'implémente un sous-ensemble</em>.</p>
+
+<p>Le pattern est toujours le même : faire la même chose que l'incumbent, ou plus, en cent fois moins de code, avec cent fois moins de dépendances, sans amputer la surface fonctionnelle. Ce que Bellard compresse, c'est l'implémentation. Ce qu'il n'ampute jamais, c'est le spec.</p>
+
+<p>C'est cette discipline qu'il faut pour construire un web post-LLM honnête. La tentation facile est de réduire les ambitions pour simplifier. Supprimer une feature pour tenir dans une démo. Contourner un edge case pour livrer plus vite. Chaque coupe semble raisonnable. Ensemble elles reconstruisent la médiocrité.</p>
+
+<p>C'est la règle que je m'impose pour <code>webmcp-auto-ui</code>. Le package <code>core</code> fait 2569 lignes de TypeScript. Zéro dépendance runtime. Il implémente les 17 features MUST du draft W3C WebMCP du 27 mars 2026, plus un client MCP Streamable HTTP, plus un validateur JSON Schema. Le SDK officiel équivalent, avec ses dépendances, pèse dix fois plus pour une couverture comparable. Je revendique cette différence comme une position éthique, pas comme une prouesse technique.</p>
+
+<p>Emmanuel appartient à la même lignée. Son travail depuis vingt ans sur les données publiques françaises — OpenFisca, data.gouv, aujourd'hui Moulineuse et Tricoteuses — est marqué par la même économie de moyens et la même rigueur.</p>
+
+<h2>7. Quatre blocs de contexte</h2>
+
+<p>Quand un agent LLM reçoit son system prompt, ce prompt contient la description de ce qu'il peut faire. La forme habituelle est une liste plate d'outils. Cette forme pose un problème qu'on ne voit pas avec dix outils et qui devient douloureux à trente — les outils ne sont pas du même type. Un outil qui interroge une base parlementaire et un outil qui affiche un graphique n'ont rien en commun, sauf qu'ils sont callables.</p>
+
+<p>Dans <code>webmcp-auto-ui</code>, le contexte est structuré en quatre blocs nommés.</p>
+
+<pre>mcp.tools       outils exposés par les serveurs MCP connectés
+mcp.recipes     recettes pré-écrites fournies par ces serveurs
+webmcp.tools    composants UI enregistrés localement via le polyfill
+webmcp.recipes  recettes de composition côté vue</pre>
+
+<p>Cette structure matérialise la séparation données/vue directement dans le prompt. Un agent qui lit ce contexte comprend en une passe que <code>mcp.*</code> sert à obtenir de l'information et que <code>webmcp.*</code> sert à montrer de l'information. Un humain qui débugge voit en dix secondes d'où vient chaque capacité. Une seule chose à retenir : <strong>la structure du prompt système enseigne à l'agent l'architecture du système.</strong></p>
+
+<h2>8. Les recettes — des deux côtés</h2>
+
+<p>Depuis le début j'utilise le mot recette sans l'avoir défini. Voici la définition d'Emmanuel, à peu de choses près. Une recette est un objet, peu importe son format exact, qui aide l'agent à faire mieux, plus vite, ou avec moins d'erreurs une opération qui implique des outils. C'est tout. Pas d'ontologie compliquée. Une recette est un aide-mémoire exécutable.</p>
+
+<p>Les recettes existent des deux côtés de la symétrie. Côté MCP, le serveur Moulineuse expose des recettes pré-écrites pour des requêtes parlementaires fréquentes. Un agent peut appeler <code>top_votes_par_groupe</code> sans savoir comment construire la requête SQL sous-jacente. La recette encapsule la connaissance métier. Côté WebMCP, une recette de vue décrit comment composer des composants pour un cas d'usage récurrent.</p>
+
+<!-- SVG 3: Recipe exchange / skillpedia -->
+<figure class="figure">
+<svg viewBox="0 0 580 340" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+  <defs>
+    <marker id="arr4" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 z" fill="#8b2e1f" opacity="0.5"/>
+    </marker>
+  </defs>
+
+  <!-- Central skillpedia -->
+  <rect x="200" y="120" width="180" height="80" rx="4" fill="none" stroke="#8b2e1f" stroke-width="1.5"/>
+  <text x="290" y="148" font-family="Georgia, serif" font-size="13" fill="#8b2e1f" text-anchor="middle">Skillpedia</text>
+  <text x="290" y="166" font-family="Georgia, serif" font-size="10" fill="#999" text-anchor="middle" font-style="italic">wiki ouvert de recettes</text>
+  <text x="290" y="182" font-family="'SF Mono', monospace" font-size="9" fill="#bbb" text-anchor="middle">hyperskills.net/recipes</text>
+
+  <!-- Domain wikis -->
+  <rect x="20" y="30" width="140" height="56" rx="3" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="90" y="52" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">Tricoteuses</text>
+  <text x="90" y="68" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">recettes parlementaires</text>
+  <text x="90" y="80" font-family="'SF Mono', monospace" font-size="8" fill="#bbb" text-anchor="middle">43 recettes · CC BY-SA</text>
+
+  <rect x="420" y="30" width="140" height="56" rx="3" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="490" y="52" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">iNaturalist wiki</text>
+  <text x="490" y="68" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">recettes observations</text>
+  <text x="490" y="80" font-family="'SF Mono', monospace" font-size="8" fill="#bbb" text-anchor="middle">17 recettes · CC BY-SA</text>
+
+  <rect x="20" y="240" width="140" height="56" rx="3" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="90" y="262" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">Données de santé</text>
+  <text x="90" y="278" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">recettes santé publique</text>
+  <text x="90" y="290" font-family="'SF Mono', monospace" font-size="8" fill="#bbb" text-anchor="middle">8 recettes · CC BY-SA</text>
+
+  <rect x="420" y="240" width="140" height="56" rx="3" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="490" y="262" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">Éducation</text>
+  <text x="490" y="278" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">recettes pédagogiques</text>
+  <text x="490" y="290" font-family="'SF Mono', monospace" font-size="8" fill="#bbb" text-anchor="middle">12 recettes · CC BY-SA</text>
+
+  <!-- Arrows -->
+  <line x1="160" y1="58" x2="200" y2="148" stroke="#d4cfc0" stroke-width="1" marker-end="url(#arr4)"/>
+  <line x1="420" y1="58" x2="380" y2="148" stroke="#d4cfc0" stroke-width="1" marker-end="url(#arr4)"/>
+  <line x1="160" y1="268" x2="200" y2="190" stroke="#d4cfc0" stroke-width="1" marker-end="url(#arr4)"/>
+  <line x1="420" y1="268" x2="380" y2="190" stroke="#d4cfc0" stroke-width="1" marker-end="url(#arr4)"/>
+
+  <!-- Recipe card example -->
+  <rect x="195" y="238" width="190" height="76" rx="3" fill="none" stroke="#8b2e1f" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="290" y="256" font-family="'SF Mono', monospace" font-size="9" fill="#8b2e1f" text-anchor="middle">parlementaire-profile.yaml</text>
+  <text x="205" y="272" font-family="'SF Mono', monospace" font-size="8" fill="#999">components: [profile, stat,</text>
+  <text x="205" y="284" font-family="'SF Mono', monospace" font-size="8" fill="#999">             chart, timeline]</text>
+  <text x="205" y="296" font-family="'SF Mono', monospace" font-size="8" fill="#999">interactions: timeline→chart</text>
+  <text x="205" y="308" font-family="'SF Mono', monospace" font-size="8" fill="#bbb">format: WebMCP 0.1</text>
+
+  <line x1="290" y1="200" x2="290" y2="238" stroke="#8b2e1f" stroke-width="0.8" stroke-dasharray="2,3" opacity="0.5"/>
+</svg>
+<figcaption>Skillpedia — un wiki ouvert de recettes WebMCP par domaine. Chaque communauté de praticiens bâtit son propre langage de motifs au sens d'Alexander, hébergé simplement, sans plateforme propriétaire.</figcaption>
+</figure>
+
+<p>Voici à quoi ressemble une recette simple.</p>
+
+<pre>name: parlementaire-profile
+description: Profil complet d'un parlementaire avec stats, votes, interventions
+components_used:
+  - profile
+  - stat
+  - chart
+  - timeline
+layout:
+  type: vertical
+  order: [profile, stat, chart, timeline]
+interactions:
+  - when: timeline.date-selected
+    then: chart.update-filter
+example_data:
+  actor_uid: PA722142</pre>
+
+<p>La <code>description</code> est ce que verront les autres composeurs et ce que l'agent lira. Les <code>interactions</code> décrivent les liaisons par le bus d'événements — cliquer sur une date dans la timeline filtre automatiquement le graphique adjacent. Une fois déposée dans le dossier des recettes du serveur WebMCP, cette recette devient disponible pour tous les agents qui consomment ce serveur. N'importe quel utilisateur peut appeler la recette en disant simplement <em>utilise la recette profil parlementaire pour Ruffin</em>.</p>
+
+<p>Cette simplicité fait la différence entre une infrastructure réservée aux développeurs et une infrastructure que les praticiens peuvent étendre. Un praticien qui a passé trois ans à analyser des données parlementaires sait mieux que n'importe quel développeur comment présenter ces données. Si on lui demande d'écrire du JavaScript, il ne le fera pas. Si on lui demande d'éditer un fichier YAML de vingt lignes en suivant un template, il le fera.</p>
+
+<h2>9. Deux APIs qui ne font pas la même chose</h2>
+
+<p>Il existe dans <code>webmcp-auto-ui</code> deux APIs pour composer des widgets. Une API historique avec un outil par type — <code>render_stat</code>, <code>render_table</code>, <code>render_chart</code>. Et une API plus récente avec un outil unifié et de la découverte intégrée — <code>component("stat", {...})</code>, <code>component("help")</code>.</p>
+
+<p>Un lecteur pressé dirait : gardez-en une, jetez l'autre, simplifiez. C'est le réflexe anti-bellardien à discipliner. Les deux APIs ne font pas la même chose, même si elles se recouvrent.</p>
+
+<p><code>render_*</code> est l'API impérative. Elle sert quand on sait déjà ce qu'on veut rendre. Une hyper-recette figée, quand elle est rechargée, rejoue ses appels — elle appelle <code>render_stat</code> directement parce que tous ses paramètres sont connus à l'avance. Style déclaratif, direct, sans latence.</p>
+
+<p><code>component()</code> est l'API introspective. Elle sert quand on ne sait pas encore ce qui est disponible ou qu'on découvre le catalogue. Un agent qui arrive sur une session et qui n'a jamais vu ce serveur WebMCP fait <code>component("help")</code>, puis <code>component("help", "hemicycle")</code>, puis <code>component("hemicycle", { ... })</code>. Style exploratoire, négocié, avec un aller-retour de plus.</p>
+
+<p>Les garder toutes les deux n'est pas une dette transitoire. C'est un choix architectural à deux niveaux. Ce qu'il ne faut pas faire, c'est laisser les deux APIs diverger dans l'implémentation — le code doit factoriser le catalogue à un seul endroit et exposer les deux surfaces au-dessus.</p>
+
+<h2>10. Composer une vue, concrètement</h2>
+
+<p>Cette section s'adresse aux composeurs : assistants parlementaires, journalistes de données, fonctionnaires qui construisent des tableaux de bord. Le niveau technique attendu est <em>je sais cliquer sur un lien et copier une URL</em>. Pas plus.</p>
+
+<p>Vous ouvrez <code>demos.hyperskills.net/flex</code>. Si c'est la première fois, on vous demande de choisir un modèle : Claude Haiku sur les serveurs d'Anthropic, rapide mais nécessite une clé d'API ; ou Gemma 4 E2B qui tourne entièrement dans votre navigateur, gratuit mais requiert un téléchargement initial de 2 Go. Vous choisissez Gemma si vous travaillez sur des données sensibles, Haiku si vous voulez aller vite.</p>
+
+<p>Vous tapez votre intention dans le chat : <em>Montre-moi les votes des trois derniers scrutins à l'Assemblée par groupe politique, avec un graphique et une chronologie.</em></p>
+
+<p>L'agent lit. Il consulte ses quatre blocs de contexte. Il construit un plan. Vous ne voyez pas ce plan — il reste interne. Ce que vous voyez, c'est le résultat qui apparaît progressivement sur le canvas. Un titre. Un graphique en barres. Une timeline. Le graphique en barres verticales ne vous plaît pas — les noms des groupes sont longs. Vous cliquez dessus. Un menu apparaît. Vous choisissez barres horizontales. Le widget se retransforme instantanément. Pas besoin de parler à l'agent. C'est de la manipulation directe.</p>
+
+<p>Vous cliquez sur <em>Figer ce skill</em>. Une modale apparaît. Taille : 12 Ko brut, 4 Ko après gzip. URL complète : <code>https://demos.hyperskills.net/flex/?hs=</code> suivie d'une longue chaîne base64. Vous copiez l'URL. Vous l'envoyez à votre député par Signal.</p>
+
+<p>Trois heures plus tard, votre député clique. Son téléphone décode l'URL, reconstitue l'état. Il voit exactement ce que vous avez figé. L'interface est en mode consommateur par défaut — pas de chat, pas de panneau qui distrait. Il trouve une chose qui manque, clique sur <em>Mode composeur</em>, tape sa demande, fige une nouvelle version, vous renvoie l'URL. Vous recevez la nouvelle URL, vous voyez la version modifiée. L'agent vous dit : <em>cette version descend de la version que vous avez produite, hash abc123</em>.</p>
+
+<!-- Screenshot figure -->
+<figure class="screenshot-figure">
+  <img src="preview.webp" alt="Auto-UI flex — canvas de composition avec profils de pionniers de l'informatique (Alan Kay, Ivan Sutherland, Douglas Engelbart, Tim Berners-Lee, Adele Goldberg, Ted Nelson, Hedy Lamarr, Grace Hopper, Radia Perlman, Jean Bartik)">
+  <div class="screenshot-caption">Auto-UI flex — une session de composition sur Wikipedia. Chaque carte profile est un widget autonome, composé par l'agent à partir d'une requête en langue naturelle. L'URL encode l'état complet.</div>
+</figure>
+
+<h2>11. Mode consommateur / mode composeur</h2>
+
+<p>L'interface a deux modes. En mode consommateur — le mode par défaut quand on ouvre une URL reçue par SMS ou par mail — l'utilisateur voit la vue telle qu'elle a été figée. Il peut interagir avec les widgets, trier des colonnes, filtrer une timeline, zoomer sur une carte. Il ne compose pas. C'est le mode du parlementaire qui reçoit une note de son assistante.</p>
+
+<p>En mode composeur, l'utilisateur voit le même état figé, plus le chat, plus les outils. Il peut modifier, dupliquer, transformer, réorganiser. Quand il est satisfait, il fige une nouvelle version qui référence la précédente comme parent.</p>
+
+<p>Le passage entre les deux modes est un bouton. Pas un compte. Pas une connexion. Cette absence de friction est délibérée — je veux que la lecture soit zéro effort et que la modification soit un choix facile.</p>
+
+<p>Chaque composant reçoit un prop <code>mode</code>. En mode consommateur, les points de prise sont masqués par CSS. En mode composeur, ils sont révélés. Un seul composant, pas deux versions qui divergent.</p>
+
+<h2>12. La provenance visible sur chaque widget</h2>
+
+<p>Chaque widget rendu dans une hyper-recette porte un indicateur visuel de sa provenance. Un badge discret. Un tooltip au survol : <em>Source : Moulineuse, recette amendements_par_groupe, exécutée le 8 avril 2026 à 14h32. Widget : profile-card, version 0.5.1.</em></p>
+
+<p>Quand un parlementaire compose une vue pour prendre une décision qui affectera des millions de personnes, savoir d'où vient chaque donnée est essentiel. Si une colonne dit <em>75% des députés ont voté contre</em>, il faut pouvoir savoir d'où vient ce 75% — de quelle source, de quelle requête, à quelle date, avec quelle définition de voté contre. Sans cette provenance, le chiffre est un slogan. Avec, c'est un fait documenté.</p>
+
+<p>Le design doit être discret mais consultable. Un petit badge dans le coin du widget, un détail complet au survol.</p>
+
+<h2>13. La lignée</h2>
+
+<p>Si vous connaissez l'histoire des idées hypertextuelles, vous avez reconnu plusieurs motifs. Je m'inscris délibérément dans une lignée.</p>
+
+<p><strong>Ted Nelson</strong> a nommé l'hypertexte en 1965. Son rêve — Xanadu — était un système d'interconnexion universelle des données où tout document pouvait transclure n'importe quel autre, avec traçabilité des versions et des auteurs. Le web de Berners-Lee a réalisé une version plus modeste et c'est précisément pour ça qu'il a été adopté. Mais Nelson avait raison sur l'essentiel : un objet numérique devrait connaître ses origines et survivre à ses serveurs. L'hyper-recette est une tentative de récupérer cette propriété sans attendre Xanadu.</p>
+
+<p><strong>Tim Berners-Lee</strong> a rendu concret en 1989 ce que Nelson rêvait. Les choix qu'il a faits ont été critiqués — pas de transclusion, pas de versionnement, des liens unidirectionnels et cassables. Mais ces choix ont permis au web de se répandre. En 2016, il a créé Solid pour reconstruire un web où les utilisateurs possèdent leurs données dans des pods personnels. Solid n'a pas atteint l'adoption de masse. Je partage l'ambition de Solid et je l'applique à un objet légèrement différent : pas la propriété des données, mais la propriété des compositions d'interaction.</p>
+
+<p><strong>Bret Victor</strong> n'a pas créé de protocole. Il a écrit, parlé, fait des démos. Ses essais entre 2011 et 2019 — <em>Learnable Programming, Magic Ink, Up and Down the Ladder of Abstraction, Seeing Spaces</em> — forment un corpus critique sur la médiocrité des interfaces contemporaines. Victor reproche aux outils de développement de forcer un détour par le texte. Dans ses outils, on manipule la représentation directement. Ma dette envers Victor, c'est la direction : manipulation directe des widgets, pas de détour par un éditeur de code, feedback immédiat.</p>
+
+<p><strong>Alan Kay</strong> est derrière presque tout ce qui précède. Smalltalk à Xerox PARC dans les années 1970. Le Dynabook qui en 1972 décrivait un ordinateur personnel portable pour l'éducation des enfants, vingt ans avant que la technologie le permette. La notion d'ordinateur comme médium, pas comme outil. Kay est un critique féroce de la médiocrité ambiante et un défenseur infatigable de l'ambition intellectuelle dans la conception d'outils numériques. Ma dette envers lui est, simplement, la conviction que ça devrait être mieux. Pas un peu mieux. Beaucoup mieux.</p>
+
+<p><strong>Christopher Alexander</strong>. <em>A Pattern Language</em> en 1977. <em>The Timeless Way of Building</em> en 1979. Sa thèse : les habitants d'un bâtiment doivent être impliqués dans sa conception, parce qu'ils savent des choses sur leur vie quotidienne que l'architecte ne peut pas deviner. Le rôle de l'architecte n'est pas de concevoir pour eux mais de leur fournir un vocabulaire de possibilités — les patterns — et de les accompagner dans leurs choix. C'est une position politique sur le pouvoir de concevoir son environnement. Elle s'applique aux outils numériques. Les utilisateurs d'hyper-recettes doivent avoir accès aux patterns et pouvoir les combiner, sans passer par un développeur.</p>
+
+<p><strong>Ivan Sutherland</strong>. <em>Sketchpad</em> en 1963. <em>The Ultimate Display</em> en 1965. Sutherland a écrit que le rôle d'un display est d'être un <em>looking-glass into a mathematical wonderland</em>. Un objet qui vous permet de vous familiariser avec des concepts qui n'ont pas d'équivalent dans le monde physique. Sa thèse profonde est que l'ordinateur sert à comprendre des choses qu'on ne peut pas comprendre sans lui. Pas à automatiser des tâches qu'on ferait sans lui, seulement plus lentement. Les hyper-recettes, au mieux, sont ce genre de miroir. Une assistante parlementaire qui compose une vue n'est pas en train de faire un travail qu'elle ferait à la main plus lentement. Elle fait un travail qu'elle ne pourrait pas faire du tout sans cet outil — croiser six sources, les présenter dans une forme lisible, les transmettre comme un objet citable.</p>
+
+<p><strong>Emmanuel</strong>. Pour le cadrage initial. Le <code>component()</code> refactor du 8 avril. La symétrie MCP/WebMCP des recettes. La rigueur de spécification. Vingt ans de travail sur les communs de données publiques françaises. L'entêtement à nommer les patterns qu'il voit plutôt que de se laisser porter par la mode. Ce texte et ce projet n'auraient pas cette forme sans lui.</p>
+
+<h2>14. Ce qui reste à faire</h2>
+
+<p>Je n'ai pas tout résolu. L'audit ligne par ligne du polyfill <code>core</code>. Les 2569 lignes affirment couvrir les 17 features MUST du draft W3C — personne n'a vérifié cette affirmation feature par feature. Il faut ajouter une trace de couverture, soit en commentaires structurés dans le code, soit dans un document séparé.</p>
+
+<p>La portabilité du contrat UI au-delà de Svelte. Aujourd'hui le package <code>ui</code> est entièrement Svelte. Pour que le projet soit adoptable au-delà des développeurs Svelte, il faut documenter le contrat qu'une implémentation alternative — React, Vue, vanilla — doit respecter. Ce contrat doit vivre séparément, comme un document, pas comme du code.</p>
+
+<p>Les mesures publiques. Le README ne contient aucun chiffre. Taille minifiée comparée au SDK MCP officiel. Couverture de spec. Nombre de dépendances par package. Taille typique d'une hyper-recette en octets. Sans ces chiffres, personne ne peut juger le projet sans lire tout le code. C'est anti-bellardien dans la communication.</p>
+
+<p>Le test à grande échelle. La cible est le hackathon de l'Assemblée nationale. Une démo où parlementaires, assistants et administrateurs composent ensemble, figent, partagent. Si cette démo tourne devant cent personnes sans s'effondrer et sans explications préalables, le projet a passé son test.</p>
+
+<h2>15. Ce que vous pouvez faire maintenant</h2>
+
+<p>Si vous êtes développeur, lisez le code. Le package <code>core</code> tient dans un après-midi. Le polyfill WebMCP est dans <code>packages/core/src/polyfill.ts</code>. Si vous trouvez quelque chose de faux, ouvrez un issue. Si vous voulez porter <code>ui</code> vers React ou Vue, attendez le contrat documenté — il arrive.</p>
+
+<p>Si vous êtes designer, regardez les démos sur <code>demos.hyperskills.net</code>. Composez quelques vues. Notez ce qui vous frustre. Est-ce que le geste de figer est au bon endroit ? Est-ce que la provenance des widgets est visible sans être intrusive ? Ce retour vaut plus que des opinions sur l'architecture.</p>
+
+<p>Si vous êtes journaliste de données ou analyste, essayez de produire une investigation publiable sur des données publiques que vous connaissez. Pas un exemple jouet. Une vraie investigation. Les hyper-recettes que vous produisez peuvent servir de cas d'usage et de test de robustesse du format.</p>
+
+<p>Si vous êtes dans une institution publique — mairie, préfecture, ministère, école, bibliothèque — contactez-nous. Ce projet est libre. Je peux organiser une démonstration adaptée à votre contexte. Je n'ai rien à vendre. Je cherche des terrains de test.</p>
+
+<h2>Épilogue</h2>
+
+<p>Sutherland a écrit en 1965 qu'un écran d'ordinateur peut être un <em>looking-glass into a mathematical wonderland</em>. Une fenêtre vers des choses qu'on ne peut pas savoir autrement.</p>
+
+<p>Je crois que les hyper-recettes peuvent être une fenêtre vers un autre territoire. Pas mathématique. Civique. Une fenêtre vers des données publiques qu'on ne peut pas comprendre sans outils, et que les outils propriétaires d'aujourd'hui présentent dans la forme qui sert leurs propres intérêts.</p>
+
+<p>Je veux ce miroir construit en commun. Je veux qu'il survive à ses auteurs. Je veux qu'il soit assez simple pour qu'une assistante parlementaire l'utilise sans formation, et assez ouvert pour qu'un programmeur l'étende sans demander permission.</p>
+
+<p>Le code est sur <a href="https://github.com/jeanbaptiste/webmcp-auto-ui">github.com/jeanbaptiste/webmcp-auto-ui</a>. Les démos sont sur <a href="https://demos.hyperskills.net">demos.hyperskills.net</a>. La spec du format est sur <a href="https://hyperskills.net">hyperskills.net</a>.</p>
+
+<p>Si vous lisez ceci et vous voyez ce que je vois, écrivez-moi. Le projet est petit. Il peut grandir.</p>
+
+</article>
+
+<div class="refs">
+  <ul>
+    <li>Ivan E. Sutherland, <a href="https://worrydream.com/refs/Sutherland_1965_-_The_Ultimate_Display.pdf">The Ultimate Display</a>, IFIP Congress, 1965.</li>
+    <li>Ted Nelson, <a href="http://www.xanadu.com">Project Xanadu</a>, depuis 1965.</li>
+    <li>Christopher Alexander, <em>A Pattern Language</em>, Oxford University Press, 1977.</li>
+    <li>W3C, <a href="https://www.w3.org/TR/webmcp/">WebMCP Working Draft</a>, 27 mars 2026.</li>
+    <li>Anthropic, <a href="https://modelcontextprotocol.io">Model Context Protocol</a>, novembre 2024.</li>
+    <li>Emmanuel Raviart, <a href="https://github.com/eraviart/moulineuse">Moulineuse</a> — serveur MCP pour les données parlementaires françaises.</li>
+    <li>Hackerspaces, <a href="https://wiki.hackerspaces.org/Design_Patterns">Design Patterns</a>.</li>
+    <li>Lucy Suchman, <em>Plans and Situated Actions</em>, Cambridge University Press, 1987.</li>
+  </ul>
+</div>
+
+</div><!-- end FR -->
+
+
+<!-- ============================================================ EN ============================================================ -->
+<div lang-content="en">
+
+<header>
+  <h1>The Dance of Know-how in the Age of AI</h1>
+  <p class="author"><a href="https://github.com/jeanbaptiste">@jeanbaptiste</a></p>
+  <p class="subtitle">Hyper-recipes as the medium of the post-LLM web.</p>
+  <p class="meta">Essay · April 2026 · ~45 min</p>
+</header>
+
+<article>
+
+<p>I want to describe something that does not exist yet and should.</p>
+
+<p>For three years now, the industry has settled on a single answer to the question of what the right form of interaction with an LLM looks like. A chatbot. A text rectangle in a window. You type, the agent answers. Sometimes it calls a tool behind the curtain and rephrases the result. In every case, it is a process in a box and you stay on the other side.</p>
+
+<p>We are watching a ballet. We are not dancing.</p>
+
+<p>The web of 1994 had the same problem before Mosaic (the first web browser). Gopher worked. Nobody remembers it because what came after was more relevant. The chatbot in its current form is the Gopher of the post-LLM web. It will function for a few years. Then something different will appear.</p>
+
+<p>I want that new paradigm to be a commons, not a rent. That is why I am writing this.</p>
+
+<h2>1. A scene that contains the whole problem</h2>
+
+<p>A parliamentary assistant in Paris. Her deputy sits on the Social Affairs committee. Tomorrow morning they examine a bill on disability. Before 6pm she needs to produce a document showing four things: who filed which amendments on this topic in six months, how each group voted, which associations were heard, and a comparison with the previous three parliaments.</p>
+
+<p>She has three options. Everything by hand — four hours, an unreadable spreadsheet. A proprietary tool — several thousand euros a year, she sees what the vendor decided to show her. Or a chatbot — the table comes out clean, but she cannot modify it, cannot share it interactively, and cannot verify where the numbers come from.</p>
+
+<p>None of the three is enough. And they all miss the problem for the same reason.</p>
+
+<p>The real problem is not how to answer the question. It is how to produce together an object that will outlive the conversation. An object a human thought up, an agent helped compose, that another human can open, modify, archive, and verify. What is missing is not a smarter AI. It is <em>the object</em>.</p>
+
+<h2>2. The missing object</h2>
+
+<p>I call it a hyper-recipe. Its properties are as follows.</p>
+
+<p>It contains a composed state. One or more widgets, each tied to a data source, in a certain order, with certain possible interactions between them. Not a conversation. A state.</p>
+
+<p>It is addressed by its content. Two identical hyper-recipes have the same address. Change one character and the address changes. This is what git does for commits, IPFS for files.</p>
+
+<p>It fits in a URL. Literally. A string of characters you send by SMS, paste into an email. The link is the object, encoded. When you click, your browser decodes and reconstructs the state. No hyper-recipe server. No database.</p>
+
+<p>It can be modified. You receive a hyper-recipe from a colleague. You open it. You change a widget. You freeze a new version. The new version knows the old one by its hash. The chain is traceable.</p>
+
+<p>It survives. Its author. Its server. The tool that composed it. Like a static HTML page from 1996, it will open in twenty years provided the data sources it references are still there. This object is not new. It is what Ted Nelson called a hypertextual object in 1965.</p>
+
+<!-- SVG 1 reuse -->
+<figure class="figure">
+<a href="https://hyperskills.net" target="_blank" rel="noopener" title="Open a real hyper-recipe on hyperskills.net" style="display:block;border:none;">
+<svg viewBox="0 0 580 320" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+  <defs>
+    <marker id="arre" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#bbb"/>
+    </marker>
+  </defs>
+  <rect x="20" y="20" width="540" height="34" rx="4" fill="none" stroke="#8b2e1f" stroke-width="1.2" stroke-dasharray="4,2" opacity="0.6"/>
+  <text x="34" y="42" font-family="'SF Mono', monospace" font-size="10" fill="#8b2e1f" opacity="0.8">hyperskills.net</text>
+  <text x="128" y="42" font-family="'SF Mono', monospace" font-size="10" fill="#999">/?hs=eyJ3aWRnZXRzIjpb…</text>
+  <text x="490" y="42" font-family="Georgia, serif" font-size="9" fill="#8b2e1f" font-style="italic">↗</text>
+  <rect x="20" y="74" width="160" height="90" rx="3" fill="none" stroke="#8b2e1f" stroke-width="1.2"/>
+  <text x="30" y="92" font-family="Georgia, serif" font-size="11" fill="#888" font-style="italic">widget: profile</text>
+  <text x="30" y="112" font-family="'SF Mono', monospace" font-size="10" fill="#555">actor_uid: PA722142</text>
+  <text x="30" y="128" font-family="'SF Mono', monospace" font-size="10" fill="#555">source: Moulineuse</text>
+  <text x="30" y="144" font-family="'SF Mono', monospace" font-size="10" fill="#555">recipe: parl-profile</text>
+  <rect x="200" y="74" width="160" height="90" rx="3" fill="none" stroke="#8b2e1f" stroke-width="1.2"/>
+  <text x="210" y="92" font-family="Georgia, serif" font-size="11" fill="#888" font-style="italic">widget: chart</text>
+  <text x="210" y="112" font-family="'SF Mono', monospace" font-size="10" fill="#555">type: bar-horizontal</text>
+  <text x="210" y="128" font-family="'SF Mono', monospace" font-size="10" fill="#555">source: Moulineuse</text>
+  <text x="210" y="144" font-family="'SF Mono', monospace" font-size="10" fill="#555">listens: timeline.*</text>
+  <rect x="380" y="74" width="180" height="90" rx="3" fill="none" stroke="#8b2e1f" stroke-width="1.2"/>
+  <text x="390" y="92" font-family="Georgia, serif" font-size="11" fill="#888" font-style="italic">widget: timeline</text>
+  <text x="390" y="112" font-family="'SF Mono', monospace" font-size="10" fill="#555">range: 2022–2026</text>
+  <text x="390" y="128" font-family="'SF Mono', monospace" font-size="10" fill="#555">source: Légifrance</text>
+  <text x="390" y="144" font-family="'SF Mono', monospace" font-size="10" fill="#555">emits: date-selected</text>
+  <line x1="360" y1="136" x2="382" y2="136" stroke="#bbb" stroke-width="1" marker-end="url(#arre)"/>
+  <text x="362" y="128" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">date-selected</text>
+  <rect x="20" y="190" width="250" height="30" rx="2" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="30" y="210" font-family="'SF Mono', monospace" font-size="10" fill="#999">hash: e3f7a2c09d4b81  (v1)</text>
+  <line x1="270" y1="205" x2="300" y2="205" stroke="#d4cfc0" stroke-width="1" marker-end="url(#arre)"/>
+  <rect x="300" y="190" width="260" height="30" rx="2" fill="none" stroke="#8b2e1f" stroke-width="1"/>
+  <text x="310" y="210" font-family="'SF Mono', monospace" font-size="10" fill="#8b2e1f">hash: 9c1a4f2e0b73d5  (v2, parent: v1)</text>
+  <text x="20" y="250" font-family="Georgia, serif" font-size="11" fill="#888" font-style="italic">The artifact encodes state, sources, provenance and version chain.</text>
+  <text x="20" y="266" font-family="Georgia, serif" font-size="11" fill="#888" font-style="italic">No server required. The link is the object.</text>
+  <text x="20" y="295" font-family="'SF Mono', monospace" font-size="9" fill="#ccc">webmcp-auto-ui · flex · hyperskills.net</text>
+</svg>
+</a>
+<figcaption>Anatomy of a hyper-recipe — <a href="https://hyperskills.net" target="_blank" rel="noopener">click to open a real one</a>. The URL encodes the complete state — widgets, sources, bindings, version hash. Nothing stored server-side.</figcaption>
+</figure>
+
+<h2>3. The web we lost without deciding to</h2>
+
+<p>The web of 1994–2005 had a property we have forgotten. Anyone could publish a page on shared hosting for fifty francs a month. Anyone in the world could read it without permission. That web was distributed, egalitarian, persistent.</p>
+
+<p>We lost all that. Not by decision. By accumulation of small commercial choices that each seemed reasonable. You publish a photo on Instagram — it is not your photo, it is a representation hosted at Meta. Same for your Google Docs, your Notion pages, your ChatGPT artifacts. Every object you produce with a modern tool is hosted, not hypertextual. If the tool disappears or bans you, the object disappears.</p>
+
+<p>The post-LLM web, as it is settling in before us, reproduces this slide one layer up. Your conversations with LLMs are hosted. Your artifacts are hosted. When you share an artifact with a colleague, you share a link pointing to a proprietary server that may change tomorrow.</p>
+
+<p>I want the other web. Not identically. Its topology, applied to a new object: the composition of interaction between a human, an agent and data.</p>
+
+<h2>4. The five-year test</h2>
+
+<p>Take a Claude artifact you liked. Note the date. In five years, will it still be accessible exactly as you published it? The honest answer is no. The infrastructure will have changed. Retention policies will have been revised.</p>
+
+<p>Now take a static HTML page written in 1996. In almost every case it opens today exactly as it did then. Not because the infrastructure was preserved — the infrastructure is dead. It opens because the object carries everything it needs to render itself.</p>
+
+<p>That self-sufficiency defines hypertext. Not the presence of links. Not the formatting. The capacity of an object to exist without its origin server. A hyper-recipe is an HTML page from 2026 enriched with a connection to data and an agent. Everything else follows from that.</p>
+
+<h2>5. Why now</h2>
+
+<p>Two ingredients were missing. They arrived together in 2024–2026.</p>
+
+<p>The first is the Model Context Protocol, or MCP. Anthropic published it in late 2024. JSON-RPC over HTTP, about fifteen methods. Its spec fits in a few pages. Its importance is not in the technology — it is in the fact that it was adopted. Hundreds of public MCP servers exist today: French parliamentary data, iNaturalist observations, Hacker News archives, data.gouv, Wikipedia, OpenStreetMap. Before MCP, exposing a data source to an agent was custom work. After MCP, it is a standard exercise.</p>
+
+<p>The second is WebMCP. The browser-side counterpart. A web page can expose its components as tools, symmetrically. The W3C published a draft in spring 2026. Chrome Canary 146 is beginning to implement it natively. With WebMCP, the interface itself exposes its capabilities — the agent can interact with the interface in a structured way, not just display results.</p>
+
+<p>These two building blocks change what is possible inside a web page. And they are so recent that the right abstractions above them are not yet settled. The industry has not decided. This is a window. I want to write in that window before it closes.</p>
+
+<!-- SVG 2 EN -->
+<figure class="figure">
+<svg viewBox="0 0 580 300" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+  <defs>
+    <marker id="arr2e" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#8b2e1f" opacity="0.6"/>
+    </marker>
+    <marker id="arr3e" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#ccc"/>
+    </marker>
+  </defs>
+  <rect x="215" y="110" width="150" height="60" rx="4" fill="none" stroke="#8b2e1f" stroke-width="1.5"/>
+  <text x="290" y="137" font-family="Georgia, serif" font-size="13" fill="#8b2e1f" text-anchor="middle">LLM Agent</text>
+  <text x="290" y="155" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">structured system prompt</text>
+  <rect x="20" y="40" width="130" height="44" rx="3" fill="none" stroke="#ccc" stroke-width="1"/>
+  <text x="85" y="59" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">Moulineuse</text>
+  <text x="85" y="74" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">parliamentary data</text>
+  <rect x="20" y="102" width="130" height="44" rx="3" fill="none" stroke="#ccc" stroke-width="1"/>
+  <text x="85" y="121" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">iNaturalist MCP</text>
+  <text x="85" y="136" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">nature observations</text>
+  <rect x="20" y="164" width="130" height="44" rx="3" fill="none" stroke="#ccc" stroke-width="1"/>
+  <text x="85" y="183" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">data.gouv MCP</text>
+  <text x="85" y="198" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">French public data</text>
+  <line x1="150" y1="62" x2="215" y2="128" stroke="#ccc" stroke-width="1" marker-end="url(#arr3e)"/>
+  <line x1="150" y1="124" x2="215" y2="138" stroke="#ccc" stroke-width="1" marker-end="url(#arr3e)"/>
+  <line x1="150" y1="186" x2="215" y2="152" stroke="#ccc" stroke-width="1" marker-end="url(#arr3e)"/>
+  <text x="158" y="108" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">mcp.tools</text>
+  <text x="158" y="120" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">mcp.recipes</text>
+  <rect x="430" y="60" width="130" height="170" rx="3" fill="none" stroke="#8b2e1f" stroke-width="1"/>
+  <text x="495" y="82" font-family="Georgia, serif" font-size="11" fill="#8b2e1f" text-anchor="middle">WebMCP Canvas</text>
+  <rect x="442" y="92" width="106" height="28" rx="2" fill="none" stroke="#d4cfc0" stroke-width="0.8"/>
+  <text x="495" y="111" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">widget: profile</text>
+  <rect x="442" y="128" width="106" height="28" rx="2" fill="none" stroke="#d4cfc0" stroke-width="0.8"/>
+  <text x="495" y="147" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">widget: chart</text>
+  <rect x="442" y="164" width="106" height="28" rx="2" fill="none" stroke="#d4cfc0" stroke-width="0.8"/>
+  <text x="495" y="183" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">widget: timeline</text>
+  <text x="495" y="218" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic" text-anchor="middle">event bus</text>
+  <line x1="365" y1="130" x2="430" y2="140" stroke="#8b2e1f" stroke-width="1" marker-end="url(#arr2e)" stroke-dasharray="3,2"/>
+  <line x1="430" y1="155" x2="365" y2="148" stroke="#8b2e1f" stroke-width="1" marker-end="url(#arr2e)" stroke-dasharray="3,2" opacity="0.5"/>
+  <text x="368" y="126" font-family="Georgia, serif" font-size="9" fill="#8b2e1f" font-style="italic">webmcp.tools</text>
+  <text x="368" y="162" font-family="Georgia, serif" font-size="9" fill="#999" font-style="italic" opacity="0.7">state → URL</text>
+  <ellipse cx="290" cy="258" rx="14" ry="14" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="290" y="263" font-family="Georgia, serif" font-size="10" fill="#bbb" text-anchor="middle">∴</text>
+  <line x1="290" y1="170" x2="290" y2="244" stroke="#d4cfc0" stroke-width="1" stroke-dasharray="2,3"/>
+  <text x="305" y="215" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">human</text>
+  <text x="20" y="265" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">mcp.* → fetch information</text>
+  <text x="20" y="278" font-family="Georgia, serif" font-size="9" fill="#bbb" font-style="italic">webmcp.* → display information</text>
+</svg>
+<figcaption>The MCP / WebMCP symmetry. Left: data servers. Right: the browser canvas. The agent reads left, composes right. The structure of the system prompt teaches the agent the architecture of the system.</figcaption>
+</figure>
+
+<h2>6. Bellard's standard</h2>
+
+<p>Before going into the code, a quality standard. Without one, everything above is just positioning.</p>
+
+<p>Fabrice Bellard understood what <em>making things simple</em> means when it could be confused with making them less. TinyCC is a complete C compiler in 100 KB. It compiles all of C89 and most of C99. Its generated code is slower than GCC's — but it compiles the same language. It does not say <em>I don't support unions</em>. QuickJS implements the full ES2023 and passes test262 at over 99%. What it loses against V8 is speed on hot loops. It does not say <em>I implement a subset</em>.</p>
+
+<p>The pattern is always the same: do the same thing as the incumbent, or more, in a hundred times less code, with a hundred times fewer dependencies, without cutting the functional surface. What Bellard compresses is the implementation. What he never cuts is the spec.</p>
+
+<p>That is the discipline needed to build an honest post-LLM web. The easy temptation, when building a new system, is to reduce ambitions to simplify. Remove a feature to fit in a demo. Work around an edge case to ship faster. Each cut seems reasonable. Together they rebuild mediocrity.</p>
+
+<p>This is the rule I impose on <code>webmcp-auto-ui</code>. The <code>core</code> package is 2569 lines of TypeScript. Zero runtime dependencies. It implements the 17 MUST features from the W3C WebMCP draft of March 27, 2026, plus an MCP Streamable HTTP client, plus a JSON Schema validator. The equivalent official SDK, with its dependencies, weighs ten times more for comparable coverage. I claim this difference as an ethical position, not a technical feat.</p>
+
+<p>Emmanuel belongs to the same lineage. His twenty years working on French public data commons — OpenFisca, data.gouv, now Moulineuse and Tricoteuses — is marked by the same economy of means and the same rigor.</p>
+
+<h2>7. Four blocks of context</h2>
+
+<p>When an LLM agent receives its system prompt, that prompt contains a description of what it can do. The usual form is a flat list of tools. This causes a problem that is invisible at ten tools and becomes painful at thirty — the tools are not of the same type. A tool that queries a parliamentary database and a tool that displays a chart share nothing, except that they are callable.</p>
+
+<p>In <code>webmcp-auto-ui</code>, the context is structured into four named blocks.</p>
+
+<pre>mcp.tools       tools exposed by connected MCP servers
+mcp.recipes     pre-written recipes provided by those servers
+webmcp.tools    UI components registered locally via the polyfill
+webmcp.recipes  view-composition recipes</pre>
+
+<p>This structure materializes the data/view separation directly inside the prompt. An agent reading this context understands in one pass that <code>mcp.*</code> serves to <em>obtain</em> information and that <code>webmcp.*</code> serves to <em>display</em> information. One thing to remember: <strong>the structure of the system prompt teaches the agent the architecture of the system.</strong></p>
+
+<h2>8. Recipes — on both sides</h2>
+
+<p>A recipe is an object, whatever its exact format, that helps the agent do something better, faster, or with fewer errors when tools are involved. That is all. No complicated ontology. A recipe is an executable aide-mémoire.</p>
+
+<p>Recipes exist on both sides of the symmetry. On the MCP side, the Moulineuse server exposes pre-written recipes for common parliamentary queries. An agent can call <code>top_votes_par_groupe</code> without knowing how to build the underlying SQL query. On the WebMCP side, a view recipe describes how to compose components for a recurring use case.</p>
+
+<!-- SVG 3 EN -->
+<figure class="figure">
+<svg viewBox="0 0 580 340" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+  <defs>
+    <marker id="arr4e" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 z" fill="#8b2e1f" opacity="0.5"/>
+    </marker>
+  </defs>
+  <rect x="200" y="120" width="180" height="80" rx="4" fill="none" stroke="#8b2e1f" stroke-width="1.5"/>
+  <text x="290" y="148" font-family="Georgia, serif" font-size="13" fill="#8b2e1f" text-anchor="middle">Skillpedia</text>
+  <text x="290" y="166" font-family="Georgia, serif" font-size="10" fill="#999" text-anchor="middle" font-style="italic">open recipe wiki</text>
+  <text x="290" y="182" font-family="'SF Mono', monospace" font-size="9" fill="#bbb" text-anchor="middle">hyperskills.net/recipes</text>
+  <rect x="20" y="30" width="140" height="56" rx="3" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="90" y="52" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">Tricoteuses</text>
+  <text x="90" y="68" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">parliamentary recipes</text>
+  <text x="90" y="80" font-family="'SF Mono', monospace" font-size="8" fill="#bbb" text-anchor="middle">43 recipes · CC BY-SA</text>
+  <rect x="420" y="30" width="140" height="56" rx="3" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="490" y="52" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">iNaturalist wiki</text>
+  <text x="490" y="68" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">observation recipes</text>
+  <text x="490" y="80" font-family="'SF Mono', monospace" font-size="8" fill="#bbb" text-anchor="middle">17 recipes · CC BY-SA</text>
+  <rect x="20" y="240" width="140" height="56" rx="3" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="90" y="262" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">Health data</text>
+  <text x="90" y="278" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">public health recipes</text>
+  <text x="90" y="290" font-family="'SF Mono', monospace" font-size="8" fill="#bbb" text-anchor="middle">8 recipes · CC BY-SA</text>
+  <rect x="420" y="240" width="140" height="56" rx="3" fill="none" stroke="#d4cfc0" stroke-width="1"/>
+  <text x="490" y="262" font-family="Georgia, serif" font-size="11" fill="#555" text-anchor="middle">Education</text>
+  <text x="490" y="278" font-family="'SF Mono', monospace" font-size="9" fill="#999" text-anchor="middle">pedagogical recipes</text>
+  <text x="490" y="290" font-family="'SF Mono', monospace" font-size="8" fill="#bbb" text-anchor="middle">12 recipes · CC BY-SA</text>
+  <line x1="160" y1="58" x2="200" y2="148" stroke="#d4cfc0" stroke-width="1" marker-end="url(#arr4e)"/>
+  <line x1="420" y1="58" x2="380" y2="148" stroke="#d4cfc0" stroke-width="1" marker-end="url(#arr4e)"/>
+  <line x1="160" y1="268" x2="200" y2="190" stroke="#d4cfc0" stroke-width="1" marker-end="url(#arr4e)"/>
+  <line x1="420" y1="268" x2="380" y2="190" stroke="#d4cfc0" stroke-width="1" marker-end="url(#arr4e)"/>
+  <rect x="195" y="238" width="190" height="76" rx="3" fill="none" stroke="#8b2e1f" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="290" y="256" font-family="'SF Mono', monospace" font-size="9" fill="#8b2e1f" text-anchor="middle">parlementaire-profile.yaml</text>
+  <text x="205" y="272" font-family="'SF Mono', monospace" font-size="8" fill="#999">components: [profile, stat,</text>
+  <text x="205" y="284" font-family="'SF Mono', monospace" font-size="8" fill="#999">             chart, timeline]</text>
+  <text x="205" y="296" font-family="'SF Mono', monospace" font-size="8" fill="#999">interactions: timeline→chart</text>
+  <text x="205" y="308" font-family="'SF Mono', monospace" font-size="8" fill="#bbb">format: WebMCP 0.1</text>
+  <line x1="290" y1="200" x2="290" y2="238" stroke="#8b2e1f" stroke-width="0.8" stroke-dasharray="2,3" opacity="0.5"/>
+</svg>
+<figcaption>Skillpedia — an open wiki of WebMCP recipes by domain. Each community of practitioners builds its own pattern language in Alexander's sense, hosted simply, without a proprietary platform.</figcaption>
+</figure>
+
+<p>A practitioner who has spent three years analyzing parliamentary data knows better than any developer how to present that data. If you ask them to write JavaScript, they will not do it. If you ask them to edit a twenty-line YAML file following a template, they will.</p>
+
+<h2>9. Composing a view, concretely</h2>
+
+<p>You open <code>demos.hyperskills.net/flex</code>. If it is your first time, you choose a model: Claude Haiku running on Anthropic's servers, fast but requires an API key; or Gemma 4 E2B running entirely in your browser, free but requires an initial 2GB download. You choose Gemma for sensitive data, Haiku when you want speed.</p>
+
+<p>You type your intention in the chat: <em>Show me the votes from the last three divisions in the National Assembly by political group, with a chart and a timeline.</em></p>
+
+<p>The agent reads. It consults its four context blocks. It builds a plan. You don't see this plan — it stays internal. What you see is the result appearing progressively on the canvas. A title. A bar chart. A timeline. The vertical bar chart does not work for you — the group names are long. You click on it. A menu appears. You choose horizontal bars. The widget transforms instantly. No need to speak to the agent. Direct manipulation.</p>
+
+<p>You click <em>Freeze this skill</em>. A modal appears. Size: 12 KB raw, 4 KB gzipped. Full URL: <code>https://demos.hyperskills.net/flex/?hs=</code> followed by a long base64 string. You copy the URL. You send it to your deputy via Signal.</p>
+
+<p>Three hours later, your deputy clicks. Their phone opens the browser. The browser decodes the URL, reconstructs the state. They see exactly what you froze. The interface is in consumer mode by default — no chat, no distracting panels. They click <em>Composer mode</em>, type their request, freeze a new version, send you the URL back.</p>
+
+<!-- Screenshot figure -->
+<figure class="screenshot-figure">
+  <img src="preview.webp" alt="Auto-UI flex — composition canvas with profiles of computing pioneers (Alan Kay, Ivan Sutherland, Douglas Engelbart, Tim Berners-Lee, Adele Goldberg, Ted Nelson, Hedy Lamarr, Grace Hopper, Radia Perlman, Jean Bartik)">
+  <div class="screenshot-caption">Auto-UI flex — a composition session on Wikipedia. Each profile card is an autonomous widget, composed by the agent from a natural-language request. The URL encodes the complete state.</div>
+</figure>
+
+<h2>10. The lineage</h2>
+
+<p>If you know the history of hypertextual ideas, you will have recognized several patterns. I am deliberately positioning myself within a lineage.</p>
+
+<p><strong>Ted Nelson</strong> named hypertext in 1965. His dream — Xanadu — was a system of universal interconnection where any document could transclude any other, with version and author traceability. Berners-Lee's web realized a more modest version, and that is precisely why it was adopted. But Nelson was right about the essential: a digital object should know its origins and survive its servers. The hyper-recipe is an attempt to recover that property without waiting for Xanadu.</p>
+
+<p><strong>Tim Berners-Lee</strong> made concrete in 1989 what Nelson dreamed. The choices he made were criticized — no transclusion, no versioning, unidirectional and breakable links. But those choices let the web spread. In 2016, he created Solid to rebuild a web where users own their data in personal pods. Solid did not reach mass adoption. I share Solid's ambition and apply it to a slightly different object: not ownership of data, but ownership of compositions of interaction.</p>
+
+<p><strong>Bret Victor</strong> did not create a protocol. He wrote, spoke, made demos. His essays between 2011 and 2019 — <em>Learnable Programming, Magic Ink, Up and Down the Ladder of Abstraction, Seeing Spaces</em> — form a critical body of work on the mediocrity of contemporary interfaces. Victor reproaches development tools for forcing a detour through text. In his tools, you manipulate the representation directly. My debt to Victor is the direction: direct manipulation of widgets, no detour through a code editor, immediate feedback.</p>
+
+<p><strong>Alan Kay</strong> is behind almost all of what precedes. Smalltalk at Xerox PARC in the 1970s. The Dynabook, which in 1972 described a portable personal computer for children's education, twenty years before technology made it possible. The notion of the computer as medium, not as tool. Kay is a fierce critic of ambient mediocrity and a tireless defender of intellectual ambition in designing digital tools. My debt to him is, simply, the conviction that it should be better. Not a little better. A lot better.</p>
+
+<p><strong>Christopher Alexander</strong>. <em>A Pattern Language</em> in 1977. <em>The Timeless Way of Building</em> in 1979. His thesis: the inhabitants of a building must be involved in its design, because they know things about their daily lives that the architect cannot guess. The architect's role is not to design for them but to provide a vocabulary of possibilities — the patterns — and accompany them in their choices. This is a political position on the power to design one's environment. It applies to digital tools.</p>
+
+<p><strong>Ivan Sutherland</strong>. <em>Sketchpad</em> in 1963. <em>The Ultimate Display</em> in 1965. Sutherland wrote that the role of a display is to be a looking-glass into a mathematical wonderland. An object that lets you become familiar with concepts that have no equivalent in the physical world. His deeper thesis is that the computer serves to understand things you cannot understand without it — not to automate tasks you would do without it, only slower. Hyper-recipes, at their best, are this kind of looking-glass. A parliamentary assistant composing a view is not doing a job she would do by hand more slowly. She is doing a job she could not do at all without this tool.</p>
+
+<p><strong>Emmanuel</strong>. For the initial framing. The <code>component()</code> refactor of April 8. The MCP/WebMCP symmetry of recipes. Specification rigor. Twenty years of work on French public data commons. The stubbornness to name patterns he sees rather than be carried by fashion. This text and this project would not take this form without him.</p>
+
+<h2>11. What remains to do</h2>
+
+<p>I have not solved everything. The line-by-line audit of the <code>core</code> polyfill. The 2569 lines claim to cover the 17 MUST features of the W3C draft — nobody has verified this claim feature by feature. I need to add a coverage trace, either in structured comments in the code or in a separate document.</p>
+
+<p>The portability of the UI contract beyond Svelte. Today the <code>ui</code> package is entirely Svelte. For the project to be adoptable beyond Svelte developers, the contract that an alternative implementation — React, Vue, vanilla — must respect needs to be documented. This contract should live separately, as a document, not as code.</p>
+
+<p>Public measurements. The README contains no numbers. Minified size compared to the official MCP SDK. Spec coverage. Number of dependencies per package. Typical size of a hyper-recipe in bytes. Without these numbers, nobody can judge the project without reading all the code. It is anti-Bellardian in the communication.</p>
+
+<p>The full-scale test. The target is the National Assembly hackathon. A demo where parliamentarians, assistants and administrators compose together, freeze, share. If this demo runs before a hundred people without collapsing and without prior explanations, the project has passed its test.</p>
+
+<h2>Epilogue</h2>
+
+<p>Sutherland wrote in 1965 that a computer screen can be a looking-glass into a mathematical wonderland. A window into things you cannot know otherwise.</p>
+
+<p>I believe hyper-recipes can be a window into another territory. Not mathematical. Civic. A window into public data you cannot understand without tools, and which today's proprietary tools present in the form that serves their own interests.</p>
+
+<p>I want this mirror built in common. I want it to outlive its authors. I want it simple enough for a parliamentary assistant to use without training, and open enough for a programmer to extend without asking permission.</p>
+
+<p>The code is at <a href="https://github.com/jeanbaptiste/webmcp-auto-ui">github.com/jeanbaptiste/webmcp-auto-ui</a>. The demos are at <a href="https://demos.hyperskills.net">demos.hyperskills.net</a>. The format spec is at <a href="https://hyperskills.net">hyperskills.net</a>.</p>
+
+<p>If you read this and you see what I see, write to me. The project is small. It can grow.</p>
+
+</article>
+
+<div class="refs">
+  <ul>
+    <li>Ivan E. Sutherland, <a href="https://worrydream.com/refs/Sutherland_1965_-_The_Ultimate_Display.pdf">The Ultimate Display</a>, IFIP Congress, 1965.</li>
+    <li>Ted Nelson, <a href="http://www.xanadu.com">Project Xanadu</a>, since 1965.</li>
+    <li>Christopher Alexander, <em>A Pattern Language</em>, Oxford University Press, 1977.</li>
+    <li>W3C, <a href="https://www.w3.org/TR/webmcp/">WebMCP Working Draft</a>, March 27, 2026.</li>
+    <li>Anthropic, <a href="https://modelcontextprotocol.io">Model Context Protocol</a>, November 2024.</li>
+    <li>Emmanuel Raviart, <a href="https://github.com/eraviart/moulineuse">Moulineuse</a> — MCP server for French parliamentary data.</li>
+    <li>Hackerspaces, <a href="https://wiki.hackerspaces.org/Design_Patterns">Design Patterns</a>.</li>
+    <li>Lucy Suchman, <em>Plans and Situated Actions</em>, Cambridge University Press, 1987.</li>
+  </ul>
+</div>
+
+</div><!-- end EN -->
+
+<footer>
+  <p>CC BY-SA 4.0 — Copyright CERI SAS · <span id="footer-text">Écrit dans l'intention que les lecteurs à venir — humains et machines — héritent de quelque chose qu'ils puissent comprendre.</span></p>
+</footer>
+
+<script>
+const i18n = {
+  fr: {
+    "footer": "Écrit dans l'intention que les lecteurs à venir — humains et machines — héritent de quelque chose qu'ils puissent vraiment tenir."
+  },
+  en: {
+    "footer": "Written with the intention that future readers — human and machine — inherit something they can actually hold."
+  }
+};
+
+function setLang(lang) {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[lang-content]').forEach(el => {
+    el.classList.toggle('visible', el.getAttribute('lang-content') === lang);
+  });
+  document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('footer-text').textContent = i18n[lang].footer;
+  window.scrollTo(0, 0);
+  try { localStorage.setItem('hyperskills-lang', lang); } catch(e) {}
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('btn-theme').textContent = theme === 'dark' ? '☀' : '☾';
+  try { localStorage.setItem('hyperskills-theme', theme); } catch(e) {}
+}
+
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  setTheme(cur === 'dark' ? 'light' : 'dark');
+}
+
+// Init: always start light (toggle is in light position)
+const savedTheme = (() => { try { return localStorage.getItem('hyperskills-theme'); } catch(e) { return null; } })();
+setTheme(savedTheme || 'light');
+
+const savedLang = (() => { try { return localStorage.getItem('hyperskills-lang'); } catch(e) { return null; } })();
+const browserLang = navigator.language.startsWith('fr') ? 'fr' : 'en';
+setLang(savedLang || browserLang);
+</script>
+
+</body>
+</html>
