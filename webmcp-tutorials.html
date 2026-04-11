@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title data-i18n="meta.title">Trois façons d'intégrer vos composants avec webmcp-auto-ui</title>
+<meta name="description" data-i18n="meta.desc" content="Guide d'intégration de webmcp-auto-ui : créez un serveur WebMCP avec Svelte, intégrez les widgets natifs, ou construisez une bibliothèque Material UI.">
+<meta name="author" content="jeanbaptiste">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://blog.hyperskills.net/webmcp-tutorials.html">
+
+<meta property="og:type" content="article">
+<meta property="og:title" data-i18n="meta.title" content="Trois façons d'intégrer vos composants avec webmcp-auto-ui">
+<meta property="og:description" data-i18n="meta.desc" content="Guide d'intégration de webmcp-auto-ui : créez un serveur WebMCP avec Svelte, intégrez les widgets natifs, ou construisez une bibliothèque Material UI.">
+<meta property="og:url" content="https://blog.hyperskills.net/webmcp-tutorials.html">
+<meta property="og:site_name" content="HyperSkills Blog">
+<meta property="og:locale" content="fr_FR">
+<meta property="article:author" content="https://github.com/jeanbaptiste">
+<meta property="article:published_time" content="2026-04-11">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@jeanbaptiste">
+
+<script type="application/ld+json" id="ld-json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Trois façons d'intégrer vos composants avec webmcp-auto-ui",
+  "author": { "@type": "Person", "name": "jeanbaptiste", "url": "https://github.com/jeanbaptiste" },
+  "datePublished": "2026-04-11",
+  "dateModified": "2026-04-11",
+  "inLanguage": "fr",
+  "publisher": { "@type": "Organization", "name": "webmcp-auto-ui", "url": "https://github.com/jeanbaptiste/webmcp-auto-ui" },
+  "license": "https://www.gnu.org/licenses/agpl-3.0.html"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --sage:           #B8CCAA;
+  --sage-light:     #EDF3E7;
+  --sage-mid:       #96B083;
+  --sage-dark:      #4A6B38;
+  --sage-deeper:    #2D4521;
+  --blush:          #DFC0B8;
+  --blush-light:    #F7EEEC;
+  --blush-mid:      #C99E94;
+  --blush-dark:     #7A4840;
+  --lavender:       #C2B8D8;
+  --lavender-light: #F0EDF7;
+  --lavender-mid:   #9E8EC0;
+  --lavender-dark:  #4E4270;
+  --cream:          #FAF8F3;
+  --cream-2:        #F3F0E8;
+  --ink:            #26231E;
+  --ink-mid:        #5E5A54;
+  --ink-light:      #9B9690;
+  --white:          #FFFFFF;
+  --border:         rgba(38,35,30,0.09);
+  --border-mid:     rgba(38,35,30,0.16);
+  --nav-bg:         rgba(250,248,243,0.92);
+}
+
+html.dark {
+  --cream:          #161410;
+  --cream-2:        #1E1C18;
+  --ink:            #EDE8E0;
+  --ink-mid:        #A09890;
+  --ink-light:      #68625C;
+  --white:          #1E1C18;
+  --border:         rgba(237,232,224,0.08);
+  --border-mid:     rgba(237,232,224,0.14);
+  --nav-bg:         rgba(22,20,16,0.94);
+  --sage-light:     rgba(150,176,131,0.14);
+  --sage-deeper:    #A3BB8E;
+  --blush-light:    rgba(201,158,148,0.14);
+  --blush-dark:     #C99E94;
+  --lavender-light: rgba(158,142,192,0.14);
+  --lavender-dark:  #9E8EC0;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Outfit', sans-serif; font-weight: 300; background: var(--cream); color: var(--ink); line-height: 1.65; overflow-x: hidden; transition: background 0.25s, color 0.25s; }
+
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 999; opacity: 0.5;
+}
+
+/* ── nav ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 0.5px solid var(--border);
+  padding: 0 clamp(1.5rem,5vw,5rem);
+  display: flex; align-items: center; gap: 1.5rem; height: 50px;
+}
+.nav-logo {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500;
+  color: var(--ink); text-decoration: none;
+  display: flex; align-items: center; gap: 7px; flex-shrink: 0;
+}
+.nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage-mid); }
+.nav-sep { width: 0.5px; height: 14px; background: var(--border-mid); flex-shrink: 0; }
+.nav-link { font-size: 13px; font-weight: 300; color: var(--ink-light); text-decoration: none; transition: color 0.2s; white-space: nowrap; }
+.nav-link:hover { color: var(--ink); }
+
+/* lang badge */
+.lang-badge {
+  margin-left: auto; display: flex; align-items: center; gap: 2px;
+  background: var(--cream-2); border: 0.5px solid var(--border-mid);
+  border-radius: 20px; padding: 3px 4px;
+}
+.lang-btn {
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 500;
+  border: none; background: none; cursor: pointer; color: var(--ink-light);
+  padding: 3px 8px; border-radius: 16px; transition: all 0.2s; line-height: 1;
+}
+.lang-btn.active { background: var(--cream); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+.lang-btn:hover:not(.active) { color: var(--ink-mid); }
+
+/* ── page ── */
+.page { max-width: 860px; margin: 0 auto; padding: 0 clamp(1.5rem,5vw,5rem); }
+
+/* ── hero ── */
+.hero { padding: clamp(5rem,11vw,8rem) 0 clamp(3rem,6vw,5rem); }
+
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-light);
+  display: flex; align-items: center; gap: 10px; margin-bottom: 1.75rem;
+  opacity: 0; animation: up 0.6s 0.1s ease forwards;
+}
+.hero-eyebrow::before { content:''; width: 24px; height: 0.5px; background: var(--ink-light); }
+
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.6rem,6vw,4.6rem); font-weight: 300;
+  line-height: 1.08; letter-spacing: -0.02em; color: var(--ink);
+  margin-bottom: 1.5rem; opacity: 0; animation: up 0.6s 0.2s ease forwards;
+}
+.hero h1 em { font-style: italic; color: var(--sage-dark); }
+
+.hero-desc {
+  font-size: 1.05rem; font-weight: 300; color: var(--ink-mid);
+  max-width: 520px; line-height: 1.75;
+  opacity: 0; animation: up 0.6s 0.32s ease forwards;
+}
+
+.hero-meta {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin-top: 1.25rem; font-size: 12px; color: var(--ink-light);
+  opacity: 0; animation: up 0.6s 0.4s ease forwards;
+}
+.hero-meta a { color: var(--ink-mid); text-decoration: none; border-bottom: 0.5px solid var(--border-mid); }
+.hero-meta a:hover { color: var(--sage-dark); }
+.meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border-mid); }
+
+.hero-links {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1.5rem;
+  opacity: 0; animation: up 0.6s 0.45s ease forwards;
+}
+.hero-link {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  padding: 6px 12px; border-radius: 8px; text-decoration: none;
+  border: 0.5px solid var(--border-mid); color: var(--ink-mid);
+  transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+}
+.hero-link:hover { color: var(--ink); border-color: var(--sage-mid); background: var(--sage-light); }
+
+.hero-index {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 2.5rem;
+  opacity: 0; animation: up 0.6s 0.52s ease forwards;
+}
+.index-card {
+  display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+  background: var(--white); border: 0.5px solid var(--border); border-radius: 12px;
+  text-decoration: none; color: var(--ink); transition: border-color 0.2s, transform 0.2s;
+}
+.index-card:hover { transform: translateX(4px); }
+.index-card-1:hover { border-color: var(--sage-mid); }
+.index-card-2:hover { border-color: var(--blush-mid); }
+.index-card-3:hover { border-color: var(--lavender-mid); }
+.ic-pip {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; flex-shrink: 0;
+}
+.ic-pip-1 { background: var(--sage-light); color: var(--sage-dark); }
+.ic-pip-2 { background: var(--blush-light); color: var(--blush-dark); }
+.ic-pip-3 { background: var(--lavender-light); color: var(--lavender-dark); }
+.ic-body { flex: 1; }
+.ic-title { font-size: 14px; font-weight: 500; }
+.ic-sub { font-size: 12px; color: var(--ink-light); margin-top: 1px; }
+.ic-arrow { font-size: 14px; color: var(--ink-light); }
+
+/* ── tuto ── */
+.divider { height: 0.5px; background: var(--border); }
+
+.tuto { padding: clamp(3.5rem,7vw,5.5rem) 0; scroll-margin-top: 70px; }
+.tuto-header { margin-bottom: 2.25rem; }
+
+.tuto-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+  letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem; display: block;
+}
+.tuto-1 .tuto-label { color: var(--sage-dark); }
+.tuto-2 .tuto-label { color: var(--blush-dark); }
+.tuto-3 .tuto-label { color: var(--lavender-dark); }
+
+.tuto-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem,4vw,2.9rem); font-weight: 300;
+  line-height: 1.12; letter-spacing: -0.015em; color: var(--ink); margin-bottom: 0.85rem;
+}
+.tuto-header h2 em { font-style: italic; }
+.tuto-header p { font-size: 14px; font-weight: 300; color: var(--ink-mid); line-height: 1.7; max-width: 540px; }
+
+/* ── steps accordion ── */
+.steps { display: flex; flex-direction: column; gap: 1px; }
+.step { background: var(--white); border: 0.5px solid var(--border); overflow: hidden; transition: border-color 0.2s, background 0.25s; }
+.step:first-child { border-radius: 14px 14px 0 0; }
+.step:last-child  { border-radius: 0 0 14px 14px; }
+.tuto-1 .step:hover { border-color: var(--sage); }
+.tuto-2 .step:hover { border-color: var(--blush); }
+.tuto-3 .step:hover { border-color: var(--lavender); }
+
+.step-hd { display: flex; align-items: center; gap: 14px; padding: 1rem 1.4rem; cursor: pointer; user-select: none; }
+.step-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; flex-shrink: 0;
+}
+.tuto-1 .step-num { background: var(--sage-light);    color: var(--sage-dark); }
+.tuto-2 .step-num { background: var(--blush-light);   color: var(--blush-dark); }
+.tuto-3 .step-num { background: var(--lavender-light); color: var(--lavender-dark); }
+.step-title { font-size: 14.5px; font-weight: 500; color: var(--ink); flex: 1; }
+.chevron { width: 15px; height: 15px; color: var(--ink-light); transition: transform 0.25s; flex-shrink: 0; }
+.step.open .chevron { transform: rotate(180deg); }
+.step-body { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1); }
+.step.open .step-body { max-height: 3000px; }
+.step-inner { padding: 0 1.4rem 1.4rem 3.3rem; border-top: 0.5px solid var(--border); }
+.step-desc { font-size: 13.5px; font-weight: 300; color: var(--ink-mid); line-height: 1.7; padding-top: 1rem; margin-bottom: 0.9rem; }
+.step-desc:last-child { margin-bottom: 0; }
+
+/* ── code ── */
+.code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-light); letter-spacing: 0.06em; display: block; margin-bottom: 3px; margin-top: 0.7rem; }
+.code-block { background: #1C1A16; color: #C8D4B5; border-radius: 10px; padding: 1rem 1.15rem; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; line-height: 1.85; overflow-x: auto; white-space: pre; margin-bottom: 0.5rem; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+.code-block .kw  { color: #C2B8D8; }
+.code-block .fn  { color: #F0C080; }
+.code-block .str { color: #A3BB8E; }
+.code-block .cm  { color: #5C5750; font-style: italic; }
+.code-block .hl  { color: #DFC0B8; }
+
+.file-tree { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; background: var(--cream-2); border: 0.5px solid var(--border-mid); border-radius: 10px; padding: 0.9rem 1.1rem; line-height: 2; color: var(--ink-mid); margin: 0.7rem 0; }
+.file-tree .dir { color: var(--ink); font-weight: 500; }
+.file-tree .cm  { color: var(--ink-light); }
+
+.tip { font-size: 12.5px; font-weight: 300; border-radius: 8px; padding: 9px 13px; margin-top: 9px; line-height: 1.6; border-left: 2px solid; display: flex; gap: 8px; align-items: flex-start; }
+.tip-i { flex-shrink: 0; opacity: 0.55; font-size: 12px; margin-top: 1px; }
+.tuto-1 .tip { background: var(--sage-light);    color: var(--sage-deeper);  border-left-color: var(--sage-mid); }
+.tuto-2 .tip { background: var(--blush-light);   color: var(--blush-dark);   border-left-color: var(--blush-mid); }
+.tuto-3 .tip { background: var(--lavender-light); color: var(--lavender-dark); border-left-color: var(--lavender-mid); }
+
+.ic { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; background: var(--cream-2); color: var(--ink); padding: 1px 5px; border-radius: 4px; border: 0.5px solid var(--border-mid); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0.7rem 0; }
+
+.flow { display: flex; flex-direction: column; margin: 0.7rem 0; }
+.flow-node { display: flex; align-items: center; gap: 10px; padding: 9px 13px; border-radius: 8px; font-size: 12.5px; }
+.tuto-1 .flow-node { background: var(--sage-light);    color: var(--sage-deeper); }
+.tuto-3 .flow-node { background: var(--lavender-light); color: var(--lavender-dark); }
+.fn-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.fn-sub { opacity: 0.65; font-size: 11.5px; margin-left: 6px; }
+.flow-arr { padding-left: 23px; color: var(--ink-light); font-size: 13px; height: 20px; display: flex; align-items: center; }
+
+/* ── footer ── */
+footer { padding: 2rem 0 3rem; border-top: 0.5px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; margin-top: 1rem; }
+.footer-col { display: flex; flex-direction: column; gap: 6px; }
+.footer-logo { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-light); display: flex; align-items: center; gap: 7px; }
+.footer-note { font-size: 12px; color: var(--ink-light); font-weight: 300; }
+.footer-links { display: flex; gap: 12px; flex-wrap: wrap; }
+.footer-links a { font-size: 12px; color: var(--ink-light); text-decoration: none; border-bottom: 0.5px solid transparent; transition: all 0.2s; }
+.footer-links a:hover { color: var(--sage-dark); border-bottom-color: var(--sage-mid); }
+.footer-license { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-light); }
+
+.theme-btn { border: none; background: none; cursor: pointer; color: var(--ink-light); display: flex; align-items: center; padding: 6px; border-radius: 8px; transition: color 0.2s, background 0.2s; flex-shrink: 0; }
+.theme-btn:hover { color: var(--ink); background: var(--cream-2); }
+
+@keyframes up { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+
+@media (max-width: 600px) {
+  .nav-link { display: none; }
+  .two-col { grid-template-columns: 1fr; }
+  .hero-links { flex-direction: column; }
+}
+</style>
+</head>
+
+<body>
+<p style="font-size:0.85em"><a href="./">&larr; HyperSkills Blog</a></p>
+
+<nav>
+  <a class="nav-logo" href="https://github.com/jeanbaptiste/webmcp-auto-ui" target="_blank" rel="noopener noreferrer">
+    <span class="nav-dot"></span>webmcp-auto-ui
+  </a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="#tuto-1" data-i18n="nav.t1">Svelte</a>
+  <a class="nav-link" href="#tuto-2" data-i18n="nav.t2">Natif</a>
+  <a class="nav-link" href="#tuto-3" data-i18n="nav.t3">Material UI</a>
+  <div class="lang-badge">
+    <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+  <button class="theme-btn" onclick="toggleDark()" aria-label="Toggle dark mode" id="theme-btn">
+    <svg id="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg id="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</nav>
+
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-eyebrow" data-i18n="hero.eyebrow">Documentation — Phase 8 · v2.1.1</div>
+    <h1 data-i18n="hero.h1">Trois façons d'intégrer<br>vos composants avec<br><em>webmcp-auto-ui</em></h1>
+    <p class="hero-desc" data-i18n="hero.desc">Créez un serveur WebMCP avec Svelte, intégrez les widgets natifs dans votre projet, ou construisez une bibliothèque Material UI — trois approches, un seul protocole.</p>
+
+    <div class="hero-meta">
+      <span data-i18n="hero.published">Publié le</span>
+      <time datetime="2026-04-11">11 avril 2026</time>
+      <span class="meta-dot"></span>
+      <span data-i18n="hero.by">Par</span>
+      <a href="https://github.com/jeanbaptiste" target="_blank" rel="noopener noreferrer author">@jeanbaptiste</a>
+      <span class="meta-dot"></span>
+      <span>v2.1.1</span>
+    </div>
+
+    <nav class="hero-links">
+      <a class="hero-link" href="https://github.com/jeanbaptiste/webmcp-auto-ui" target="_blank" rel="noopener noreferrer">⌥ GitHub</a>
+      <a class="hero-link" href="https://jeanbaptiste.github.io/webmcp-auto-ui/fr/" target="_blank" rel="noopener noreferrer" data-i18n-href="docs.link">◎ <span data-i18n="docs.label">Documentation FR</span></a>
+    </nav>
+
+    <div class="hero-index">
+      <a class="index-card index-card-1" href="#tuto-1">
+        <div class="ic-pip ic-pip-1">01</div>
+        <div class="ic-body">
+          <div class="ic-title" data-i18n="index.t1.title">Composants Svelte</div>
+          <div class="ic-sub" data-i18n="index.t1.sub">Créer un serveur WebMCP complet avec vos widgets Svelte</div>
+        </div>
+        <span class="ic-arrow">→</span>
+      </a>
+      <a class="index-card index-card-2" href="#tuto-2">
+        <div class="ic-pip ic-pip-2">02</div>
+        <div class="ic-body">
+          <div class="ic-title" data-i18n="index.t2.title">Intégration native <span class="ic">autoui</span></div>
+          <div class="ic-sub" data-i18n="index.t2.sub">Intégrer les widgets natifs dans votre projet existant</div>
+        </div>
+        <span class="ic-arrow">→</span>
+      </a>
+      <a class="index-card index-card-3" href="#tuto-3">
+        <div class="ic-pip ic-pip-3">03</div>
+        <div class="ic-body">
+          <div class="ic-title" data-i18n="index.t3.title">Serveur Material UI</div>
+          <div class="ic-sub" data-i18n="index.t3.sub">Construire sa propre bibliothèque designkit_webmcp_*</div>
+        </div>
+        <span class="ic-arrow">→</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TUTO 1 — SVELTE
+  ══════════════════════════════════════════ -->
+  <section class="tuto tuto-1" id="tuto-1">
+    <div class="tuto-header">
+      <span class="tuto-label" data-i18n="t1.label">Tutoriel 01</span>
+      <h2 data-i18n="t1.h2">Ajouter vos propres<br>composants <em>Svelte</em></h2>
+      <p data-i18n="t1.desc">Créez un serveur WebMCP avec vos widgets Svelte et exposez-les au LLM via des recettes — du composant au system prompt en cinq étapes.</p>
+    </div>
+
+    <div class="steps">
+
+      <div class="step open" id="sv1">
+        <div class="step-hd" onclick="tog('sv1')">
+          <div class="step-num">01</div>
+          <div class="step-title" data-i18n="t1.s1.title">Installer les packages &amp; créer la structure</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="step-desc" data-i18n="t1.s1.desc">Ajoutez <span class="ic">@webmcp-auto-ui/core</span> pour <span class="ic">createWebMcpServer</span> et <span class="ic">@webmcp-auto-ui/agent</span> pour la boucle agent et le serveur <span class="ic">autoui</span> intégré.</div>
+          <span class="code-label">terminal</span>
+          <div class="code-block"><span class="kw">npm</span> install @webmcp-auto-ui/core @webmcp-auto-ui/agent</div>
+          <div class="file-tree"><span class="dir">src/</span>
+  <span class="dir">widgets/</span>
+    KanbanBoard.svelte   <span class="cm" data-i18n="t1.s1.cm1"># votre composant</span>
+    kanban.recipe.md     <span class="cm" data-i18n="t1.s1.cm2"># la recette pour le LLM</span>
+    Timeline.svelte
+    timeline.recipe.md
+  server.ts              <span class="cm" data-i18n="t1.s1.cm3"># définition du serveur WebMCP</span>
+  main.ts</div>
+          <div class="tip"><span class="tip-i">◈</span><span data-i18n="t1.s1.tip">La recette est pour le LLM, le composant pour le rendu. Ils restent séparés jusqu'au <span class="ic">registerWidget</span>.</span></div>
+        </div></div>
+      </div>
+
+      <div class="step open" id="sv2">
+        <div class="step-hd" onclick="tog('sv2')">
+          <div class="step-num">02</div>
+          <div class="step-title" data-i18n="t1.s2.title">Écrire l'interface Props du composant</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="step-desc" data-i18n="t1.s2.desc">L'interface <span class="ic">Props</span> TypeScript est la <strong>source de vérité unique</strong>. Le schema JSON est auto-généré via <span class="ic">ts-json-schema-generator</span> — ne l'écrivez jamais à la main.</div>
+          <span class="code-label">KanbanBoard.svelte</span>
+          <div class="code-block"><span class="kw">&lt;script lang="ts"&gt;</span>
+  <span class="cm" data-i18n-cm="t1.s2.cm1"># Source de vérité → schema JSON auto-généré depuis ici</span>
+  <span class="kw">interface</span> Props {
+    title:    <span class="kw">string</span>;
+    columns:  <span class="kw">Array</span>&lt;{
+      id:     <span class="kw">string</span>;
+      label:  <span class="kw">string</span>;
+      cards:  <span class="kw">string</span>[];
+    }&gt;;
+    theme?:   <span class="str">'light'</span> | <span class="str">'dark'</span>;
+    compact?: <span class="kw">boolean</span>;
+  }
+  <span class="kw">let</span> { title, columns, theme = <span class="str">'light'</span> }: Props = $props();
+<span class="kw">&lt;/script&gt;</span>
+
+&lt;section class={theme}&gt;
+  &lt;h2&gt;{title}&lt;/h2&gt;
+  {#each columns <span class="kw">as</span> col}
+    &lt;div class=<span class="str">"column"</span>&gt;...&lt;/div&gt;
+  {/each}
+&lt;/section&gt;</div>
+          <div class="tip"><span class="tip-i">◈</span><span data-i18n="t1.s2.tip"><span class="ic">ts-json-schema-generator</span> lit le TypeScript pur — compatible Svelte 5, React, Vue et tout framework exposant une interface Props TS.</span></div>
+        </div></div>
+      </div>
+
+      <div class="step open" id="sv3">
+        <div class="step-hd" onclick="tog('sv3')">
+          <div class="step-num">03</div>
+          <div class="step-title" data-i18n="t1.s3.title">Créer la recette <span class="ic">.md</span></div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="step-desc" data-i18n="t1.s3.desc">Le frontmatter <span class="ic">schema:</span> est injecté automatiquement. Écrivez uniquement le body — votre documentation pour le LLM. Le champ <span class="ic">widget:</span> est obligatoire.</div>
+          <span class="code-label">kanban.recipe.md</span>
+          <div class="code-block"><span class="str">---
+widget: KanbanBoard
+description: </span><span class="str" data-i18n="t1.s3.recipe.desc">Tableau kanban avec colonnes et cartes,
+  idéal pour un workflow ou un backlog agile.</span><span class="str">
+schema: &lt;auto-injecté par sync:schemas&gt;
+---</span>
+
+<span data-i18n="t1.s3.recipe.body">## Quand utiliser ce widget
+Afficher un backlog, un workflow par étapes,
+ou tout ensemble de tâches organisées en colonnes.
+
+## Comment récupérer les données
+Appelez `monprojet_mcp_get_tasks`, mappez par statut en `columns[]`.</span>
+
+<span class="fn">mywidgets_webmcp_widget_display</span>({
+  name: <span class="str">"KanbanBoard"</span>,
+  params: {
+    title: <span class="str">"Sprint 4"</span>,
+    columns: [
+      { id: <span class="str">"todo"</span>,  label: <span class="str" data-i18n="t1.s3.todo">"À faire"</span>,   cards: [<span class="str">"Tâche A"</span>] },
+      { id: <span class="str">"doing"</span>, label: <span class="str" data-i18n="t1.s3.doing">"En cours"</span>, cards: [<span class="str">"Tâche B"</span>] }
+    ]
+  }
+})</div>
+          <div class="tip"><span class="tip-i">◈</span><span data-i18n="t1.s3.tip"><span class="ic">widget_display</span> prend <span class="ic">name</span> et <span class="ic">params</span> — pas un objet fusionné.</span></div>
+        </div></div>
+      </div>
+
+      <div class="step open" id="sv4">
+        <div class="step-hd" onclick="tog('sv4')">
+          <div class="step-num">04</div>
+          <div class="step-title" data-i18n="t1.s4.title">Enregistrer le serveur WebMCP</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="step-desc" data-i18n="t1.s4.desc">Associez recette + composant dans <span class="ic">server.ts</span>, puis ajoutez le layer à la boucle agent.</div>
+          <span class="code-label">server.ts</span>
+          <div class="code-block"><span class="kw">import</span> { createWebMcpServer } <span class="kw">from</span> <span class="str">'@webmcp-auto-ui/core'</span>;
+<span class="kw">import</span> kanbanRecipe   <span class="kw">from</span> <span class="str">'./widgets/kanban.recipe.md'</span>;
+<span class="kw">import</span> timelineRecipe <span class="kw">from</span> <span class="str">'./widgets/timeline.recipe.md'</span>;
+<span class="kw">import</span> KanbanBoard    <span class="kw">from</span> <span class="str">'./widgets/KanbanBoard.svelte'</span>;
+<span class="kw">import</span> Timeline       <span class="kw">from</span> <span class="str">'./widgets/Timeline.svelte'</span>;
+
+<span class="kw">export const</span> mywidgets = <span class="fn">createWebMcpServer</span>(<span class="str">'mywidgets'</span>, {
+  description: <span class="str" data-i18n="t1.s4.serverdesc">'Widgets Svelte de Mon Application'</span>
+});
+
+mywidgets.<span class="fn">registerWidget</span>(kanbanRecipe,  KanbanBoard);
+mywidgets.<span class="fn">registerWidget</span>(timelineRecipe, Timeline);</div>
+          <span class="code-label">main.ts</span>
+          <div class="code-block"><span class="kw">import</span> { runAgentLoop, AnthropicProvider, autoui } <span class="kw">from</span> <span class="str">'@webmcp-auto-ui/agent'</span>;
+<span class="kw">import</span> { mywidgets } <span class="kw">from</span> <span class="str">'./server'</span>;
+<span class="kw">import</span> myDataClient <span class="kw">from</span> <span class="str">'./data-client'</span>;
+
+<span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">runAgentLoop</span>(<span class="str" data-i18n="t1.s4.prompt">'Affiche le board'</span>, {
+  provider: <span class="kw">new</span> <span class="fn">AnthropicProvider</span>({ proxyUrl: <span class="str">'/api/chat'</span> }),
+  layers: [
+    myDataClient.<span class="fn">layer</span>(),  <span class="cm" data-i18n="t1.s4.c1">// mydata_mcp_*   → données</span>
+    autoui.<span class="fn">layer</span>(),        <span class="cm" data-i18n="t1.s4.c2">// autoui_webmcp_* → widgets natifs</span>
+    mywidgets.<span class="fn">layer</span>(),         <span class="cm" data-i18n="t1.s4.c3">// mywidgets_webmcp_*  → vos widgets</span>
+  ],
+  callbacks: {
+    onWidget: (type, data) => <span class="fn">renderWidget</span>(type, data),
+    onText:   (text)       => <span class="fn">appendText</span>(text),
+  },
+});</div>
+          <div class="tip"><span class="tip-i">◈</span><span data-i18n="t1.s4.tip">Le LLM verra automatiquement <span class="ic">mywidgets_webmcp_search_recipes</span>, <span class="ic">mywidgets_webmcp_get_recipe</span> et <span class="ic">mywidgets_webmcp_widget_display</span>.</span></div>
+        </div></div>
+      </div>
+
+      <div class="step open" id="sv5">
+        <div class="step-hd" onclick="tog('sv5')">
+          <div class="step-num">05</div>
+          <div class="step-title" data-i18n="t1.s5.title">Synchroniser les schemas &amp; valider en CI</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="step-desc" data-i18n="t1.s5.desc">Pipeline entièrement automatisé — une seule source de vérité du dev jusqu'au LLM.</div>
+          <div class="flow">
+            <div class="flow-node"><span class="fn-label">interface Props</span><span class="fn-sub" data-i18n="t1.s5.f1">— vous écrivez ici</span></div>
+            <div class="flow-arr">↓ npm run sync:schemas</div>
+            <div class="flow-node"><span class="fn-label">recipe.md frontmatter.schema</span><span class="fn-sub" data-i18n="t1.s5.f2">— auto-injecté</span></div>
+            <div class="flow-arr" data-i18n="t1.s5.f3">↓ consommé par</div>
+            <div class="flow-node"><span class="fn-label">get_recipe · widget_display · search_recipes</span><span class="fn-sub" data-i18n="t1.s5.f4">— lu &amp; validé</span></div>
+          </div>
+          <span class="code-label">terminal</span>
+          <div class="code-block"><span class="cm" data-i18n="t1.s5.cm1"># Développement — injecte les schemas dans les .md</span>
+<span class="kw">npm run</span> sync:schemas
+
+<span class="cm" data-i18n="t1.s5.cm2"># CI — échoue si les .md ne sont pas à jour</span>
+<span class="kw">npm run</span> sync:schemas <span class="hl">--check</span></div>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TUTO 2 — NATIF autoui
+  ══════════════════════════════════════════ -->
+  <section class="tuto tuto-2" id="tuto-2">
+    <div class="tuto-header">
+      <span class="tuto-label" data-i18n="t2.label">Tutoriel 02</span>
+      <h2 data-i18n="t2.h2">Intégrer les widgets<br><em>autoui</em> natifs</h2>
+      <p data-i18n="t2.desc">Utilisez le serveur <span class="ic">autoui</span> intégré à <span class="ic">@webmcp-auto-ui/agent</span> pour accéder aux 31 widgets natifs sans configurer de serveur WebMCP custom.</p>
+    </div>
+
+    <div class="steps">
+
+      <div class="step open" id="sh1">
+        <div class="step-hd" onclick="tog('sh1')">
+          <div class="step-num">01</div>
+          <div class="step-title" data-i18n="t2.s1.title">Installer le package agent</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="step-desc" data-i18n="t2.s1.desc"><span class="ic">@webmcp-auto-ui/agent</span> exporte directement <span class="ic">autoui</span> — un serveur WebMCP pré-configuré avec tous les widgets natifs (stat, table, chart, timeline, hemicycle…).</div>
+          <span class="code-label">terminal</span>
+          <div class="code-block"><span class="kw">npm</span> install @webmcp-auto-ui/agent</div>
+          <span class="code-label" data-i18n="t2.s1.usagelabel">usage immédiat</span>
+          <div class="code-block"><span class="kw">import</span> { autoui } <span class="kw">from</span> <span class="str">'@webmcp-auto-ui/agent'</span>;
+
+<span class="cm" data-i18n="t2.s1.cm1">// autoui = WebMcpServer avec tous les widgets natifs déjà enregistrés</span>
+<span class="kw">const</span> layer = autoui.<span class="fn">layer</span>();
+<span class="cm" data-i18n="t2.s1.cm2">// → { protocol: 'webmcp', serverName: 'autoui', tools: [...] }</span></div>
+        </div></div>
+      </div>
+
+      <div class="step open" id="sh2">
+        <div class="step-hd" onclick="tog('sh2')">
+          <div class="step-num">02</div>
+          <div class="step-title" data-i18n="t2.s2.title">Brancher l'agent avec <span class="ic">runAgentLoop</span></div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="step-desc" data-i18n="t2.s2.desc"><span class="ic">runAgentLoop</span> prend le message utilisateur en premier argument, puis un objet d'options. Les <span class="ic">callbacks</span> reçoivent les événements en temps réel.</div>
+          <span class="code-label">agent.ts</span>
+          <div class="code-block"><span class="kw">import</span> { autoui, runAgentLoop, AnthropicProvider } <span class="kw">from</span> <span class="str">'@webmcp-auto-ui/agent'</span>;
+<span class="kw">import</span> monApi <span class="kw">from</span> <span class="str">'./api-client'</span>;
+
+<span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">runAgentLoop</span>(<span class="str" data-i18n="t2.s2.prompt">'Montre-moi les données de ventes'</span>, {
+  provider: <span class="kw">new</span> <span class="fn">AnthropicProvider</span>({ proxyUrl: <span class="str">'/api/chat'</span> }),
+  layers: [
+    monApi.<span class="fn">layer</span>(),   <span class="cm" data-i18n="t2.s2.c1">// monapi_mcp_*   → vos données</span>
+    autoui.<span class="fn">layer</span>(),  <span class="cm" data-i18n="t2.s2.c2">// autoui_webmcp_* → 31 widgets natifs</span>
+  ],
+  maxIterations: 5,
+  callbacks: {
+    onWidget: (type, data) => {
+      <span class="cm" data-i18n="t2.s2.cm1">// type = nom du widget, data = paramètres validés</span>
+      <span class="fn">renderWidget</span>(type, data);
+      <span class="kw">return</span> { id: <span class="str">'widget-1'</span> };
+    },
+    onText: (text) => <span class="fn">appendToChat</span>(text),
+  },
+});</div>
+          <div class="tip"><span class="tip-i">◈</span><span data-i18n="t2.s2.tip"><span class="ic">onWidget</span> remplace l'ancien <span class="ic">onBlock</span> (alias déprécié). Il reçoit le type et les données déjà validées contre le schema.</span></div>
+        </div></div>
+      </div>
+
+      <div class="step open" id="sh3">
+        <div class="step-hd" onclick="tog('sh3')">
+          <div class="step-num">03</div>
+          <div class="step-title" data-i18n="t2.s3.title">Configurer le proxy API SvelteKit</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="step-desc" data-i18n="t2.s3.desc"><span class="ic">AnthropicProvider</span> envoie les requêtes à un endpoint local qui détient la clé API.</div>
+          <span class="code-label">src/routes/api/chat/+server.ts</span>
+          <div class="code-block"><span class="kw">import</span> { env } <span class="kw">from</span> <span class="str">'$env/dynamic/private'</span>;
+<span class="kw">import type</span> { RequestHandler } <span class="kw">from</span> <span class="str">'./$types'</span>;
+
+<span class="kw">export const</span> POST: RequestHandler = <span class="kw">async</span> ({ request }) => {
+  <span class="kw">const</span> body = <span class="kw">await</span> request.<span class="fn">json</span>();
+  <span class="kw">const</span> apiKey = body.__apiKey || env.ANTHROPIC_API_KEY;
+  <span class="kw">delete</span> body.__apiKey;
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://api.anthropic.com/v1/messages'</span>, {
+    method: <span class="str">'POST'</span>,
+    headers: {
+      <span class="str">'x-api-key'</span>: apiKey,
+      <span class="str">'anthropic-version'</span>: <span class="str">'2023-06-01'</span>,
+      <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+    },
+    body: <span class="fn">JSON.stringify</span>(body),
+  });
+  <span class="kw">return</span> Response.<span class="fn">json</span>(<span class="kw">await</span> res.<span class="fn">json</span>());
+};</div>
+          <div class="tip"><span class="tip-i">◈</span><span data-i18n="t2.s3.tip">La clé est lue depuis <span class="ic">ANTHROPIC_API_KEY</span> dans <span class="ic">.env</span>, ou passée à la volée via <span class="ic">body.__apiKey</span>.</span></div>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TUTO 3 — MATERIAL UI
+  ══════════════════════════════════════════ -->
+  <section class="tuto tuto-3" id="tuto-3">
+    <div class="tuto-header">
+      <span class="tuto-label" data-i18n="t3.label">Tutoriel 03</span>
+      <h2 data-i18n="t3.h2">Créer un serveur WebMCP<br>avec <em>Material UI</em></h2>
+      <p data-i18n="t3.desc">Construisez votre propre bibliothèque de composants MUI et exposez-les comme un serveur <span class="ic">designkit_webmcp_*</span> distinct.</p>
+    </div>
+
+    <div class="steps">
+
+      <div class="step open" id="mu1">
+        <div class="step-hd" onclick="tog('mu1')">
+          <div class="step-num">01</div>
+          <div class="step-title" data-i18n="t3.s1.title">Installer les dépendances</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <span class="code-label">terminal</span>
+          <div class="code-block"><span class="kw">npm</span> install @webmcp-auto-ui/core @webmcp-auto-ui/agent \
+         @mui/material @emotion/react @emotion/styled \
+         @mui/x-data-grid</div>
+        </div></div>
+      </div>
+
+      <div class="step open" id="mu2">
+        <div class="step-hd" onclick="tog('mu2')">
+          <div class="step-num">02</div>
+          <div class="step-title" data-i18n="t3.s2.title">Créer un composant React avec interface Props</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="step-desc" data-i18n="t3.s2.desc">L'interface TypeScript est la source de vérité du schema JSON — même principe qu'en Svelte.</div>
+          <span class="code-label">widgets/DataTable.tsx</span>
+          <div class="code-block"><span class="kw">import</span> { DataGrid } <span class="kw">from</span> <span class="str">'@mui/x-data-grid'</span>;
+<span class="kw">import</span> Typography   <span class="kw">from</span> <span class="str">'@mui/material/Typography'</span>;
+
+<span class="cm" data-i18n="t3.s2.cm1">// Source de vérité → schema JSON auto-généré depuis ici</span>
+<span class="kw">export interface</span> DataTableProps {
+  rows:      <span class="kw">Record</span>&lt;<span class="kw">string</span>, <span class="kw">unknown</span>&gt;[];
+  columns:   <span class="kw">Array</span>&lt;{ field: <span class="kw">string</span>; headerName: <span class="kw">string</span>; width?: <span class="kw">number</span> }&gt;;
+  title?:    <span class="kw">string</span>;
+  pageSize?: <span class="kw">number</span>;
+}
+
+<span class="kw">export function</span> <span class="fn">DataTable</span>({ rows, columns, title, pageSize = 10 }: DataTableProps) {
+  <span class="kw">return</span> (
+    &lt;div style={{ padding: <span class="str">'16px'</span> }}&gt;
+      {title &amp;&amp; &lt;Typography variant=<span class="str">"h6"</span> gutterBottom&gt;{title}&lt;/Typography&gt;}
+      &lt;DataGrid rows={rows} columns={columns}
+        pageSize={pageSize} autoHeight disableSelectionOnClick /&gt;
+    &lt;/div&gt;
+  );
+}</div>
+        </div></div>
+      </div>
+
+      <div class="step open" id="mu3">
+        <div class="step-hd" onclick="tog('mu3')">
+          <div class="step-num">03</div>
+          <div class="step-title" data-i18n="t3.s3.title">Créer la recette &amp; synchroniser le schema</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="two-col">
+            <div>
+              <span class="code-label">data-table.recipe.md</span>
+              <div class="code-block"><span class="str">---
+widget: DataTable
+description: </span><span class="str" data-i18n="t3.s3.recipe.desc">Grille MUI avec pagination
+  et tri.</span><span class="str">
+schema: &lt;auto-injecté&gt;
+---</span>
+
+<span data-i18n="t3.s3.recipe.body">## Quand l'utiliser
+Listes longues avec tri.
+
+## Données
+Via `*_mcp_list_*` → `rows[]`.</span></div>
+            </div>
+            <div>
+              <span class="code-label">terminal</span>
+              <div class="code-block"><span class="kw">npm run</span> sync:schemas
+
+<span class="cm" data-i18n="t3.s3.ci"># CI check</span>
+<span class="kw">npm run</span> sync:schemas <span class="hl">--check</span></div>
+              <div class="tip"><span class="tip-i">◈</span><span data-i18n="t3.s3.tip">CI échoue si <span class="ic">DataTableProps</span> diverge du <span class="ic">schema:</span> dans le <span class="ic">.md</span>.</span></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="step open" id="mu4">
+        <div class="step-hd" onclick="tog('mu4')">
+          <div class="step-num">04</div>
+          <div class="step-title" data-i18n="t3.s4.title">Créer le serveur designkit</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <span class="code-label">designkit-server.ts</span>
+          <div class="code-block"><span class="kw">import</span> { createWebMcpServer } <span class="kw">from</span> <span class="str">'@webmcp-auto-ui/core'</span>;
+<span class="kw">import</span> dataTableRecipe <span class="kw">from</span> <span class="str">'./widgets/data-table.recipe.md'</span>;
+<span class="kw">import</span> { DataTable }   <span class="kw">from</span> <span class="str">'./widgets/DataTable'</span>;
+<span class="kw">import</span> { setMuiTheme } <span class="kw">from</span> <span class="str">'./theme'</span>;
+
+<span class="kw">export const</span> designkit = <span class="fn">createWebMcpServer</span>(<span class="str">'designkit'</span>, {
+  description: <span class="str" data-i18n="t3.s4.serverdesc">'Composants Material Design (DataTable, Dialog...)'</span>
+});
+
+designkit.<span class="fn">registerWidget</span>(dataTableRecipe, DataTable);
+
+<span class="cm" data-i18n="t3.s4.cm1">// Tool custom — piloté directement par le LLM</span>
+designkit.<span class="fn">addTool</span>({
+  name: <span class="str">'theme'</span>,
+  description: <span class="str" data-i18n="t3.s4.themedesc">'Bascule entre thème clair et sombre'</span>,
+  inputSchema: { type: <span class="str">'object'</span>,
+    properties: { mode: { <span class="kw">enum</span>: [<span class="str">'light'</span>, <span class="str">'dark'</span>] } },
+    required: [<span class="str">'mode'</span>]
+  },
+  execute: <span class="kw">async</span> ({ mode }) => <span class="fn">setMuiTheme</span>(mode)
+});</div>
+        </div></div>
+      </div>
+
+      <div class="step open" id="mu5">
+        <div class="step-hd" onclick="tog('mu5')">
+          <div class="step-num">05</div>
+          <div class="step-title" data-i18n="t3.s5.title">Assembler les layers &amp; voir le LLM en action</div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <div class="step-desc" data-i18n="t3.s5.desc">Trois serveurs coexistent dans la même boucle. Le LLM les voit tous et choisit le bon selon le contexte.</div>
+          <span class="code-label">main.ts</span>
+          <div class="code-block"><span class="kw">import</span> { runAgentLoop, AnthropicProvider, autoui } <span class="kw">from</span> <span class="str">'@webmcp-auto-ui/agent'</span>;
+<span class="kw">import</span> { designkit } <span class="kw">from</span> <span class="str">'./designkit-server'</span>;
+<span class="kw">import</span> myApiClient <span class="kw">from</span> <span class="str">'./api-client'</span>;
+
+<span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">runAgentLoop</span>(<span class="str" data-i18n="t3.s5.prompt">'Affiche les commandes du mois'</span>, {
+  provider: <span class="kw">new</span> <span class="fn">AnthropicProvider</span>({ proxyUrl: <span class="str">'/api/chat'</span> }),
+  layers: [
+    myApiClient.<span class="fn">layer</span>(),  <span class="cm" data-i18n="t3.s5.c1">// myapi_mcp_*      → données métier</span>
+    autoui.<span class="fn">layer</span>(),       <span class="cm" data-i18n="t3.s5.c2">// autoui_webmcp_*   → 31 widgets natifs</span>
+    designkit.<span class="fn">layer</span>(),   <span class="cm" data-i18n="t3.s5.c3">// designkit_webmcp_* → vos composants MUI</span>
+  ],
+  callbacks: {
+    onWidget: (type, data) => <span class="fn">renderWidget</span>(type, data),
+  },
+});</div>
+          <span class="code-label" data-i18n="t3.s5.seqlabel">séquence d'appels LLM automatique</span>
+          <div class="code-block"><span class="fn">designkit_webmcp_search_recipes</span>({ query: <span class="str" data-i18n="t3.s5.q">"tableau"</span> })
+<span class="fn">designkit_webmcp_get_recipe</span>({ name: <span class="str">"DataTable"</span> })
+<span class="fn">myapi_mcp_list_orders</span>({ month: <span class="str">"2026-04"</span>, limit: 100 })
+<span class="fn">designkit_webmcp_widget_display</span>({
+  name:   <span class="str">"DataTable"</span>,
+  params: {
+    title: <span class="str" data-i18n="t3.s5.tabtitle">"Commandes — Avril 2026"</span>,
+    rows: [...],
+    columns: [
+      { field: <span class="str">"id"</span>,     headerName: <span class="str">"#"</span>,                         width: 80  },
+      { field: <span class="str">"client"</span>, headerName: <span class="str" data-i18n="t3.s5.col1">"Client"</span>,  width: 200 },
+      { field: <span class="str">"total"</span>,  headerName: <span class="str" data-i18n="t3.s5.col2">"Total €"</span>, width: 120 },
+    ]
+  }
+})
+<span class="cm" data-i18n="t3.s5.cmfinal">// → votre composant MUI s'affiche via onWidget</span></div>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-col">
+      <div class="footer-logo"><span class="nav-dot"></span>webmcp-auto-ui v2.1.1</div>
+      <div class="footer-note" data-i18n="footer.note">Un protocole symétrique à MCP pour l'affichage &amp; l'interaction</div>
+      <div class="footer-license">AGPL-3.0-or-later · CC BY-SA 4.0 · Copyright CERI SAS</div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-links">
+        <a href="https://github.com/jeanbaptiste/webmcp-auto-ui" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://jeanbaptiste.github.io/webmcp-auto-ui/fr/" target="_blank" rel="noopener noreferrer" data-i18n-href="docs.link" data-i18n="docs.label">Documentation FR</a>
+        <a href="https://github.com/jeanbaptiste" target="_blank" rel="noopener noreferrer">@jeanbaptiste</a>
+      </div>
+      <div class="footer-note">
+        <span data-i18n="footer.published">Publié le</span>
+        <time datetime="2026-04-11" data-i18n="footer.date">11 avril 2026</time>
+        · <a href="https://github.com/jeanbaptiste" target="_blank" style="color:var(--ink-mid);text-decoration:none;border-bottom:0.5px solid var(--border-mid)">@jeanbaptiste</a>
+      </div>
+    </div>
+    <p><a href="https://blog.hyperskills.net/webmcp-tutorials.html?hs=LS0tCnRpdGxlOiAiVGhyZWUgV2F5cyB0byBJbnRlZ3JhdGUgWW91ciBDb21wb25lbnRzIHdpdGggd2VibWNwLWF1dG8tdWkiCmRlc2NyaXB0aW9uOiAiSW50ZWdyYXRpb24gZ3VpZGUgZm9yIHdlYm1jcC1hdXRvLXVpOiBjcmVhdGUgYSBXZWJNQ1Agc2VydmVyIHdpdGggU3ZlbHRlLCBpbnRlZ3JhdGUgbmF0aXZlIHdpZGdldHMsIG9yIGJ1aWxkIGEgTWF0ZXJpYWwgVUkgbGlicmFyeS4iCmRhdGU6ICIyMDI2LTA0LTExIgphdXRob3I6ICJAamVhbmJhcHRpc3RlIgpzb3VyY2U6ICJodHRwczovL2Jsb2cuaHlwZXJza2lsbHMubmV0L3dlYm1jcC10dXRvcmlhbHMuaHRtbCIKLS0tCgojIFRocmVlIHdheXMgdG8gaW50ZWdyYXRlIHlvdXIgY29tcG9uZW50cyB3aXRoIHdlYm1jcC1hdXRvLXVpCgpEb2N1bWVudGF0aW9uIOKAlCBQaGFzZSA4IMK3IHYyLjEuMQoKQ3JlYXRlIGEgV2ViTUNQIHNlcnZlciB3aXRoIFN2ZWx0ZSwgaW50ZWdyYXRlIG5hdGl2ZSB3aWRnZXRzIGludG8geW91ciBleGlzdGluZyBwcm9qZWN0LCBvciBidWlsZCBhIE1hdGVyaWFsIFVJIGxpYnJhcnkg4oCUIHRocmVlIGFwcHJvYWNoZXMsIG9uZSBwcm90b2NvbC4KClB1Ymxpc2hlZCBBcHJpbCAxMSwgMjAyNiDCtyBCeSBbQGplYW5iYXB0aXN0ZV0oaHR0cHM6Ly9naXRodWIuY29tL2plYW5iYXB0aXN0ZSkgwrcgdjIuMS4xCgoqKlRhYmxlIG9mIGNvbnRlbnRzOioqCgoxLiAqKlN2ZWx0ZSBjb21wb25lbnRzKiog4oCUIEJ1aWxkIGEgZnVsbCBXZWJNQ1Agc2VydmVyIHdpdGggeW91ciBvd24gU3ZlbHRlIHdpZGdldHMKMi4gKipOYXRpdmUgYXV0b3VpIGludGVncmF0aW9uKiog4oCUIERyb3AgbmF0aXZlIHdpZGdldHMgaW50byB5b3VyIGV4aXN0aW5nIHByb2plY3QKMy4gKipNYXRlcmlhbCBVSSBzZXJ2ZXIqKiDigJQgQnVpbGQgeW91ciBvd24gZGVzaWdua2l0X3dlYm1jcF8qIGxpYnJhcnkKCi0tLQoKIyMgVHV0b3JpYWwgMDEg4oCUIEFkZCB5b3VyIG93biBTdmVsdGUgY29tcG9uZW50cwoKQ3JlYXRlIGEgV2ViTUNQIHNlcnZlciB3aXRoIHlvdXIgU3ZlbHRlIHdpZGdldHMgYW5kIGV4cG9zZSB0aGVtIHRvIHRoZSBMTE0gdGhyb3VnaCByZWNpcGVzIOKAlCBmcm9tIGNvbXBvbmVudCB0byBzeXN0ZW0gcHJvbXB0IGluIGZpdmUgc3RlcHMuCgojIyMgU3RlcCAwMSDigJQgSW5zdGFsbCBwYWNrYWdlcyAmIGNyZWF0ZSB0aGUgc3RydWN0dXJlCgpBZGQgYEB3ZWJtY3AtYXV0by11aS9jb3JlYCBmb3IgYGNyZWF0ZVdlYk1jcFNlcnZlcmAgYW5kIGBAd2VibWNwLWF1dG8tdWkvYWdlbnRgIGZvciB0aGUgYWdlbnQgbG9vcCBhbmQgdGhlIGJ1aWx0LWluIGBhdXRvdWlgIHNlcnZlci4KCmBgYGJhc2gKbnBtIGluc3RhbGwgQHdlYm1jcC1hdXRvLXVpL2NvcmUgQHdlYm1jcC1hdXRvLXVpL2FnZW50CmBgYAoKYGBgCnNyYy8KICB3aWRnZXRzLwogICAgS2FuYmFuQm9hcmQuc3ZlbHRlICAgIyB5b3VyIGNvbXBvbmVudAogICAga2FuYmFuLnJlY2lwZS5tZCAgICAgIyB0aGUgcmVjaXBlIGZvciB0aGUgTExNCiAgICBUaW1lbGluZS5zdmVsdGUKICAgIHRpbWVsaW5lLnJlY2lwZS5tZAogIHNlcnZlci50cyAgICAgICAgICAgICAgIyBXZWJNQ1Agc2VydmVyIGRlZmluaXRpb24KICBtYWluLnRzCmBgYAoKPiBUaGUgcmVjaXBlIGlzIGZvciB0aGUgTExNLCB0aGUgY29tcG9uZW50IGlzIGZvciByZW5kZXJpbmcuIFRoZXkgc3RheSBzZXBhcmF0ZSB1bnRpbCBgcmVnaXN0ZXJXaWRnZXRgLgoKIyMjIFN0ZXAgMDIg4oCUIFdyaXRlIHRoZSBjb21wb25lbnQgUHJvcHMgaW50ZXJmYWNlCgpUaGUgVHlwZVNjcmlwdCBgUHJvcHNgIGludGVyZmFjZSBpcyB0aGUgKipzaW5nbGUgc291cmNlIG9mIHRydXRoKiouIFRoZSBKU09OIHNjaGVtYSBpcyBhdXRvLWdlbmVyYXRlZCB2aWEgYHRzLWpzb24tc2NoZW1hLWdlbmVyYXRvcmAg4oCUIG5ldmVyIHdyaXRlIGl0IGJ5IGhhbmQuCgpgYGBzdmVsdGUKPHNjcmlwdCBsYW5nPSJ0cyI%2BCiAgLy8gU291cmNlIG9mIHRydXRoIOKGkiBKU09OIHNjaGVtYSBhdXRvLWdlbmVyYXRlZCBmcm9tIGhlcmUKICBpbnRlcmZhY2UgUHJvcHMgewogICAgdGl0bGU6ICAgIHN0cmluZzsKICAgIGNvbHVtbnM6ICBBcnJheTx7CiAgICAgIGlkOiAgICAgc3RyaW5nOwogICAgICBsYWJlbDogIHN0cmluZzsKICAgICAgY2FyZHM6ICBzdHJpbmdbXTsKICAgIH0%2BOwogICAgdGhlbWU%2FOiAgICdsaWdodCcgfCAnZGFyayc7CiAgICBjb21wYWN0PzogYm9vbGVhbjsKICB9CiAgbGV0IHsgdGl0bGUsIGNvbHVtbnMsIHRoZW1lID0gJ2xpZ2h0JyB9OiBQcm9wcyA9ICRwcm9wcygpOwo8L3NjcmlwdD4KCjxzZWN0aW9uIGNsYXNzPXt0aGVtZX0%2BCiAgPGgyPnt0aXRsZX08L2gyPgogIHsjZWFjaCBjb2x1bW5zIGFzIGNvbH0KICAgIDxkaXYgY2xhc3M9ImNvbHVtbiI%2BLi4uPC9kaXY%2BCiAgey9lYWNofQo8L3NlY3Rpb24%2BCmBgYAoKPiBgdHMtanNvbi1zY2hlbWEtZ2VuZXJhdG9yYCByZWFkcyBwdXJlIFR5cGVTY3JpcHQg4oCUIGNvbXBhdGlibGUgd2l0aCBTdmVsdGUgNSwgUmVhY3QsIFZ1ZSBhbmQgYW55IGZyYW1ld29yayBleHBvc2luZyBhIFRTIFByb3BzIGludGVyZmFjZS4KCiMjIyBTdGVwIDAzIOKAlCBDcmVhdGUgdGhlIHJlY2lwZSBgLm1kYAoKVGhlIGZyb250bWF0dGVyIGBzY2hlbWE6YCBpcyBhdXRvLWluamVjdGVkLiBXcml0ZSBvbmx5IHRoZSBib2R5IOKAlCB5b3VyIGRvY3VtZW50YXRpb24gZm9yIHRoZSBMTE0uIFRoZSBgd2lkZ2V0OmAgZmllbGQgaXMgcmVxdWlyZWQuCgpgYGBtYXJrZG93bgotLS0Kd2lkZ2V0OiBLYW5iYW5Cb2FyZApkZXNjcmlwdGlvbjogS2FuYmFuIGJvYXJkIHdpdGggZHJhZ2dhYmxlIGNvbHVtbnMgYW5kIGNhcmRzLAogIGlkZWFsIGZvciBhIHdvcmtmbG93IG9yIGFnaWxlIGJhY2tsb2cuCnNjaGVtYTogPGF1dG8taW5qZWN0ZWQgYnkgc3luYzpzY2hlbWFzPgotLS0KCiMjIFdoZW4gdG8gdXNlIHRoaXMgd2lkZ2V0CkRpc3BsYXkgYSBiYWNrbG9nIG9yIGFueSBzZXQgb2YgdGFza3Mgb3JnYW5pemVkIGludG8gY29sdW1ucy4KCiMjIEhvdyB0byBmZXRjaCBkYXRhCkNhbGwgYG15cHJvamVjdF9tY3BfZ2V0X3Rhc2tzYCwgbWFwIGJ5IHN0YXR1cyBpbnRvIGBjb2x1bW5zW11gLgoKbXl3aWRnZXRzX3dlYm1jcF93aWRnZXRfZGlzcGxheSh7CiAgbmFtZTogIkthbmJhbkJvYXJkIiwKICBwYXJhbXM6IHsKICAgIHRpdGxlOiAiU3ByaW50IDQiLAogICAgY29sdW1uczogWwogICAgICB7IGlkOiAidG9kbyIsICBsYWJlbDogIlRvIGRvIiwgICAgICAgIGNhcmRzOiBbIlRhc2sgQSJdIH0sCiAgICAgIHsgaWQ6ICJkb2luZyIsIGxhYmVsOiAiSW4gcHJvZ3Jlc3MiLCAgY2FyZHM6IFsiVGFzayBCIl0gfQogICAgXQogIH0KfSkKYGBgCgo%2BIGB3aWRnZXRfZGlzcGxheWAgdGFrZXMgYG5hbWVgIGFuZCBgcGFyYW1zYCDigJQgbm90IGEgc2luZ2xlIG1lcmdlZCBvYmplY3QuCgojIyMgU3RlcCAwNCDigJQgUmVnaXN0ZXIgdGhlIFdlYk1DUCBzZXJ2ZXIKCkFzc29jaWF0ZSByZWNpcGUgKyBjb21wb25lbnQgaW4gYHNlcnZlci50c2AsIHRoZW4gYWRkIHRoZSBsYXllciB0byB0aGUgYWdlbnQgbG9vcC4KCmBgYHRzCi8vIHNlcnZlci50cwppbXBvcnQgeyBjcmVhdGVXZWJNY3BTZXJ2ZXIgfSBmcm9tICdAd2VibWNwLWF1dG8tdWkvY29yZSc7CmltcG9ydCBrYW5iYW5SZWNpcGUgICBmcm9tICcuL3dpZGdldHMva2FuYmFuLnJlY2lwZS5tZCc7CmltcG9ydCB0aW1lbGluZVJlY2lwZSBmcm9tICcuL3dpZGdldHMvdGltZWxpbmUucmVjaXBlLm1kJzsKaW1wb3J0IEthbmJhbkJvYXJkICAgIGZyb20gJy4vd2lkZ2V0cy9LYW5iYW5Cb2FyZC5zdmVsdGUnOwppbXBvcnQgVGltZWxpbmUgICAgICAgZnJvbSAnLi93aWRnZXRzL1RpbWVsaW5lLnN2ZWx0ZSc7CgpleHBvcnQgY29uc3QgbXl3aWRnZXRzID0gY3JlYXRlV2ViTWNwU2VydmVyKCdteXdpZGdldHMnLCB7CiAgZGVzY3JpcHRpb246ICdNeSBBcHBsaWNhdGlvbiBTdmVsdGUgV2lkZ2V0cycKfSk7CgpteXdpZGdldHMucmVnaXN0ZXJXaWRnZXQoa2FuYmFuUmVjaXBlLCAgS2FuYmFuQm9hcmQpOwpteXdpZGdldHMucmVnaXN0ZXJXaWRnZXQodGltZWxpbmVSZWNpcGUsIFRpbWVsaW5lKTsKYGBgCgpgYGB0cwovLyBtYWluLnRzCmltcG9ydCB7IHJ1bkFnZW50TG9vcCwgQW50aHJvcGljUHJvdmlkZXIsIGF1dG91aSB9IGZyb20gJ0B3ZWJtY3AtYXV0by11aS9hZ2VudCc7CmltcG9ydCB7IG15d2lkZ2V0cyB9IGZyb20gJy4vc2VydmVyJzsKaW1wb3J0IG15RGF0YUNsaWVudCBmcm9tICcuL2RhdGEtY2xpZW50JzsKCmNvbnN0IHJlc3VsdCA9IGF3YWl0IHJ1bkFnZW50TG9vcCgnU2hvdyB0aGUgYm9hcmQnLCB7CiAgcHJvdmlkZXI6IG5ldyBBbnRocm9waWNQcm92aWRlcih7IHByb3h5VXJsOiAnL2FwaS9jaGF0JyB9KSwKICBsYXllcnM6IFsKICAgIG15RGF0YUNsaWVudC5sYXllcigpLCAgLy8gbXlkYXRhX21jcF8qICAg4oaSIGRhdGEKICAgIGF1dG91aS5sYXllcigpLCAgICAgICAgLy8gYXV0b3VpX3dlYm1jcF8qIOKGkiBuYXRpdmUgd2lkZ2V0cwogICAgbXl3aWRnZXRzLmxheWVyKCksICAgICAvLyBteXdpZGdldHNfd2VibWNwXyogIOKGkiB5b3VyIHdpZGdldHMKICBdLAogIGNhbGxiYWNrczogewogICAgb25XaWRnZXQ6ICh0eXBlLCBkYXRhKSA9PiByZW5kZXJXaWRnZXQodHlwZSwgZGF0YSksCiAgICBvblRleHQ6ICAgKHRleHQpICAgICAgID0%2BIGFwcGVuZFRleHQodGV4dCksCiAgfSwKfSk7CmBgYAoKPiBUaGUgTExNIHdpbGwgYXV0b21hdGljYWxseSBzZWUgYG15d2lkZ2V0c193ZWJtY3Bfc2VhcmNoX3JlY2lwZXNgLCBgbXl3aWRnZXRzX3dlYm1jcF9nZXRfcmVjaXBlYCBhbmQgYG15d2lkZ2V0c193ZWJtY3Bfd2lkZ2V0X2Rpc3BsYXlgLgoKIyMjIFN0ZXAgMDUg4oCUIFN5bmMgc2NoZW1hcyAmIHZhbGlkYXRlIGluIENJCgpGdWxseSBhdXRvbWF0ZWQgcGlwZWxpbmUg4oCUIG9uZSBzb3VyY2Ugb2YgdHJ1dGggZnJvbSBkZXYgdG8gTExNLgoKKipGbG93OioqCgoxLiBgaW50ZXJmYWNlIFByb3BzYCDigJQgeW91IHdyaXRlIGhlcmUKMi4gYG5wbSBydW4gc3luYzpzY2hlbWFzYCDihpMKMy4gYHJlY2lwZS5tZCBmcm9udG1hdHRlci5zY2hlbWFgIOKAlCBhdXRvLWluamVjdGVkCjQuIOKGkyBjb25zdW1lZCBieQo1LiBgZ2V0X3JlY2lwZSDCtyB3aWRnZXRfZGlzcGxheSDCtyBzZWFyY2hfcmVjaXBlc2Ag4oCUIHJlYWQgJiB2YWxpZGF0ZWQKCmBgYGJhc2gKIyBEZXZlbG9wbWVudCDigJQgaW5qZWN0cyBzY2hlbWFzIGludG8gLm1kIGZpbGVzCm5wbSBydW4gc3luYzpzY2hlbWFzCgojIENJIOKAlCBmYWlscyBpZiAubWQgZmlsZXMgYXJlIG91dCBvZiBzeW5jCm5wbSBydW4gc3luYzpzY2hlbWFzIC0tY2hlY2sKYGBgCgotLS0KCiMjIFR1dG9yaWFsIDAyIOKAlCBJbnRlZ3JhdGUgdGhlIG5hdGl2ZSBhdXRvdWkgd2lkZ2V0cwoKVXNlIHRoZSBgYXV0b3VpYCBzZXJ2ZXIgYnVpbHQgaW50byBgQHdlYm1jcC1hdXRvLXVpL2FnZW50YCB0byBhY2Nlc3MgYWxsIDMxIG5hdGl2ZSB3aWRnZXRzIHdpdGhvdXQgY29uZmlndXJpbmcgYSBjdXN0b20gV2ViTUNQIHNlcnZlci4KCiMjIyBTdGVwIDAxIOKAlCBJbnN0YWxsIHRoZSBhZ2VudCBwYWNrYWdlCgpgQHdlYm1jcC1hdXRvLXVpL2FnZW50YCBkaXJlY3RseSBleHBvcnRzIGBhdXRvdWlgIOKAlCBhIHByZS1jb25maWd1cmVkIFdlYk1DUCBzZXJ2ZXIgd2l0aCBhbGwgbmF0aXZlIHdpZGdldHMgcmVnaXN0ZXJlZCAoc3RhdCwgdGFibGUsIGNoYXJ0LCB0aW1lbGluZSwgaGVtaWN5Y2xlLi4uKS4KCmBgYGJhc2gKbnBtIGluc3RhbGwgQHdlYm1jcC1hdXRvLXVpL2FnZW50CmBgYAoKYGBgdHMKLy8gaW1tZWRpYXRlIHVzYWdlCmltcG9ydCB7IGF1dG91aSB9IGZyb20gJ0B3ZWJtY3AtYXV0by11aS9hZ2VudCc7CgovLyBhdXRvdWkgPSBXZWJNY3BTZXJ2ZXIgd2l0aCBhbGwgbmF0aXZlIHdpZGdldHMgYWxyZWFkeSByZWdpc3RlcmVkCmNvbnN0IGxheWVyID0gYXV0b3VpLmxheWVyKCk7Ci8vIOKGkiB7IHByb3RvY29sOiAnd2VibWNwJywgc2VydmVyTmFtZTogJ2F1dG91aScsIHRvb2xzOiBbLi4uXSB9CmBgYAoKIyMjIFN0ZXAgMDIg4oCUIENvbm5lY3QgdGhlIGFnZW50IHdpdGggYHJ1bkFnZW50TG9vcGAKCmBydW5BZ2VudExvb3BgIHRha2VzIHRoZSB1c2VyIG1lc3NhZ2UgYXMgaXRzIGZpcnN0IGFyZ3VtZW50LCB0aGVuIGFuIG9wdGlvbnMgb2JqZWN0LgoKYGBgdHMKLy8gYWdlbnQudHMKaW1wb3J0IHsgYXV0b3VpLCBydW5BZ2VudExvb3AsIEFudGhyb3BpY1Byb3ZpZGVyIH0gZnJvbSAnQHdlYm1jcC1hdXRvLXVpL2FnZW50JzsKaW1wb3J0IG1vbkFwaSBmcm9tICcuL2FwaS1jbGllbnQnOwoKY29uc3QgcmVzdWx0ID0gYXdhaXQgcnVuQWdlbnRMb29wKCdTaG93IG1lIHNhbGVzIGRhdGEnLCB7CiAgcHJvdmlkZXI6IG5ldyBBbnRocm9waWNQcm92aWRlcih7IHByb3h5VXJsOiAnL2FwaS9jaGF0JyB9KSwKICBsYXllcnM6IFsKICAgIG1vbkFwaS5sYXllcigpLCAgIC8vIG15YXBpX21jcF8qICAg4oaSIHlvdXIgZGF0YQogICAgYXV0b3VpLmxheWVyKCksICAgLy8gYXV0b3VpX3dlYm1jcF8qIOKGkiAzMSBuYXRpdmUgd2lkZ2V0cwogIF0sCiAgbWF4SXRlcmF0aW9uczogNSwKICBjYWxsYmFja3M6IHsKICAgIG9uV2lkZ2V0OiAodHlwZSwgZGF0YSkgPT4gewogICAgICAvLyB0eXBlID0gd2lkZ2V0IG5hbWUsIGRhdGEgPSB2YWxpZGF0ZWQgcGFyYW1ldGVycwogICAgICByZW5kZXJXaWRnZXQodHlwZSwgZGF0YSk7CiAgICAgIHJldHVybiB7IGlkOiAnd2lkZ2V0LTEnIH07CiAgICB9LAogICAgb25UZXh0OiAodGV4dCkgPT4gYXBwZW5kVG9DaGF0KHRleHQpLAogIH0sCn0pOwpgYGAKCj4gYG9uV2lkZ2V0YCByZXBsYWNlcyB0aGUgb2xkIGBvbkJsb2NrYCAoZGVwcmVjYXRlZCBhbGlhcykuIEl0IHJlY2VpdmVzIHRoZSB0eXBlIGFuZCBzY2hlbWEtdmFsaWRhdGVkIGRhdGEuCgojIyMgU3RlcCAwMyDigJQgU2V0IHVwIHRoZSBTdmVsdGVLaXQgQVBJIHByb3h5CgpgQW50aHJvcGljUHJvdmlkZXJgIHNlbmRzIHJlcXVlc3RzIHRvIGEgbG9jYWwgZW5kcG9pbnQgdGhhdCBob2xkcyB0aGUgQVBJIGtleS4KCmBgYHRzCi8vIHNyYy9yb3V0ZXMvYXBpL2NoYXQvK3NlcnZlci50cwppbXBvcnQgeyBlbnYgfSBmcm9tICckZW52L2R5bmFtaWMvcHJpdmF0ZSc7CmltcG9ydCB0eXBlIHsgUmVxdWVzdEhhbmRsZXIgfSBmcm9tICcuLyR0eXBlcyc7CgpleHBvcnQgY29uc3QgUE9TVDogUmVxdWVzdEhhbmRsZXIgPSBhc3luYyAoeyByZXF1ZXN0IH0pID0%2BIHsKICBjb25zdCBib2R5ID0gYXdhaXQgcmVxdWVzdC5qc29uKCk7CiAgY29uc3QgYXBpS2V5ID0gYm9keS5fX2FwaUtleSB8fCBlbnYuQU5USFJPUElDX0FQSV9LRVk7CiAgZGVsZXRlIGJvZHkuX19hcGlLZXk7CiAgY29uc3QgcmVzID0gYXdhaXQgZmV0Y2goJ2h0dHBzOi8vYXBpLmFudGhyb3BpYy5jb20vdjEvbWVzc2FnZXMnLCB7CiAgICBtZXRob2Q6ICdQT1NUJywKICAgIGhlYWRlcnM6IHsKICAgICAgJ3gtYXBpLWtleSc6IGFwaUtleSwKICAgICAgJ2FudGhyb3BpYy12ZXJzaW9uJzogJzIwMjMtMDYtMDEnLAogICAgICAnQ29udGVudC1UeXBlJzogJ2FwcGxpY2F0aW9uL2pzb24nLAogICAgfSwKICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KGJvZHkpLAogIH0pOwogIHJldHVybiBSZXNwb25zZS5qc29uKGF3YWl0IHJlcy5qc29uKCkpOwp9OwpgYGAKCj4gVGhlIGtleSBpcyByZWFkIGZyb20gYEFOVEhST1BJQ19BUElfS0VZYCBpbiBgLmVudmAsIG9yIHBhc3NlZCBhdCBydW50aW1lIHZpYSBgYm9keS5fX2FwaUtleWAuCgotLS0KCiMjIFR1dG9yaWFsIDAzIOKAlCBCdWlsZCBhIFdlYk1DUCBzZXJ2ZXIgd2l0aCBNYXRlcmlhbCBVSQoKQnVpbGQgeW91ciBvd24gTVVJIGNvbXBvbmVudCBsaWJyYXJ5IGFuZCBleHBvc2UgaXQgYXMgYSBkaXN0aW5jdCBgZGVzaWdua2l0X3dlYm1jcF8qYCBzZXJ2ZXIuCgojIyMgU3RlcCAwMSDigJQgSW5zdGFsbCBkZXBlbmRlbmNpZXMKCmBgYGJhc2gKbnBtIGluc3RhbGwgQHdlYm1jcC1hdXRvLXVpL2NvcmUgQHdlYm1jcC1hdXRvLXVpL2FnZW50IFwKICAgICAgICAgQG11aS9tYXRlcmlhbCBAZW1vdGlvbi9yZWFjdCBAZW1vdGlvbi9zdHlsZWQgXAogICAgICAgICBAbXVpL3gtZGF0YS1ncmlkCmBgYAoKIyMjIFN0ZXAgMDIg4oCUIENyZWF0ZSBhIFJlYWN0IGNvbXBvbmVudCB3aXRoIGEgUHJvcHMgaW50ZXJmYWNlCgpUaGUgVHlwZVNjcmlwdCBpbnRlcmZhY2UgaXMgdGhlIHNvdXJjZSBvZiB0cnV0aCBmb3IgdGhlIEpTT04gc2NoZW1hIOKAlCBzYW1lIHByaW5jaXBsZSBhcyBTdmVsdGUuCgpgYGB0c3gKLy8gd2lkZ2V0cy9EYXRhVGFibGUudHN4CmltcG9ydCB7IERhdGFHcmlkIH0gZnJvbSAnQG11aS94LWRhdGEtZ3JpZCc7CmltcG9ydCBUeXBvZ3JhcGh5ICAgZnJvbSAnQG11aS9tYXRlcmlhbC9UeXBvZ3JhcGh5JzsKCi8vIFNvdXJjZSBvZiB0cnV0aCDihpIgSlNPTiBzY2hlbWEgYXV0by1nZW5lcmF0ZWQgZnJvbSBoZXJlCmV4cG9ydCBpbnRlcmZhY2UgRGF0YVRhYmxlUHJvcHMgewogIHJvd3M6ICAgICAgUmVjb3JkPHN0cmluZywgdW5rbm93bj5bXTsKICBjb2x1bW5zOiAgIEFycmF5PHsgZmllbGQ6IHN0cmluZzsgaGVhZGVyTmFtZTogc3RyaW5nOyB3aWR0aD86IG51bWJlciB9PjsKICB0aXRsZT86ICAgIHN0cmluZzsKICBwYWdlU2l6ZT86IG51bWJlcjsKfQoKZXhwb3J0IGZ1bmN0aW9uIERhdGFUYWJsZSh7IHJvd3MsIGNvbHVtbnMsIHRpdGxlLCBwYWdlU2l6ZSA9IDEwIH06IERhdGFUYWJsZVByb3BzKSB7CiAgcmV0dXJuICgKICAgIDxkaXYgc3R5bGU9e3sgcGFkZGluZzogJzE2cHgnIH19PgogICAgICB7dGl0bGUgJiYgPFR5cG9ncmFwaHkgdmFyaWFudD0iaDYiIGd1dHRlckJvdHRvbT57dGl0bGV9PC9UeXBvZ3JhcGh5Pn0KICAgICAgPERhdGFHcmlkIHJvd3M9e3Jvd3N9IGNvbHVtbnM9e2NvbHVtbnN9CiAgICAgICAgcGFnZVNpemU9e3BhZ2VTaXplfSBhdXRvSGVpZ2h0IGRpc2FibGVTZWxlY3Rpb25PbkNsaWNrIC8%2BCiAgICA8L2Rpdj4KICApOwp9CmBgYAoKIyMjIFN0ZXAgMDMg4oCUIENyZWF0ZSB0aGUgcmVjaXBlICYgc3luYyB0aGUgc2NoZW1hCgpgYGBtYXJrZG93bgotLS0Kd2lkZ2V0OiBEYXRhVGFibGUKZGVzY3JpcHRpb246IE1VSSBncmlkIHdpdGggcGFnaW5hdGlvbgogIGFuZCBzb3J0aW5nLgpzY2hlbWE6IDxhdXRvLWluamVjdGVkPgotLS0KCiMjIFdoZW4gdG8gdXNlCkxvbmcgbGlzdHMgd2l0aCBzb3J0aW5nLgoKIyMgRGF0YQpGZXRjaCB2aWEgYCpfbWNwX2xpc3RfKmAg4oaSIGByb3dzW11gLgpgYGAKCmBgYGJhc2gKbnBtIHJ1biBzeW5jOnNjaGVtYXMKCiMgQ0kgY2hlY2sKbnBtIHJ1biBzeW5jOnNjaGVtYXMgLS1jaGVjawpgYGAKCj4gQ0kgZmFpbHMgaWYgYERhdGFUYWJsZVByb3BzYCBkaXZlcmdlcyBmcm9tIHRoZSBgc2NoZW1hOmAgaW4gdGhlIGAubWRgLgoKIyMjIFN0ZXAgMDQg4oCUIENyZWF0ZSB0aGUgZGVzaWdua2l0IHNlcnZlcgoKYGBgdHMKLy8gZGVzaWdua2l0LXNlcnZlci50cwppbXBvcnQgeyBjcmVhdGVXZWJNY3BTZXJ2ZXIgfSBmcm9tICdAd2VibWNwLWF1dG8tdWkvY29yZSc7CmltcG9ydCBkYXRhVGFibGVSZWNpcGUgZnJvbSAnLi93aWRnZXRzL2RhdGEtdGFibGUucmVjaXBlLm1kJzsKaW1wb3J0IHsgRGF0YVRhYmxlIH0gICBmcm9tICcuL3dpZGdldHMvRGF0YVRhYmxlJzsKaW1wb3J0IHsgc2V0TXVpVGhlbWUgfSBmcm9tICcuL3RoZW1lJzsKCmV4cG9ydCBjb25zdCBkZXNpZ25raXQgPSBjcmVhdGVXZWJNY3BTZXJ2ZXIoJ2Rlc2lnbmtpdCcsIHsKICBkZXNjcmlwdGlvbjogJ01hdGVyaWFsIERlc2lnbiBjb21wb25lbnRzIChEYXRhVGFibGUsIERpYWxvZy4uLiknCn0pOwoKZGVzaWdua2l0LnJlZ2lzdGVyV2lkZ2V0KGRhdGFUYWJsZVJlY2lwZSwgRGF0YVRhYmxlKTsKCi8vIEN1c3RvbSB0b29sIOKAlCBjYWxsZWQgZGlyZWN0bHkgYnkgdGhlIExMTQpkZXNpZ25raXQuYWRkVG9vbCh7CiAgbmFtZTogJ3RoZW1lJywKICBkZXNjcmlwdGlvbjogJ1N3aXRjaCBiZXR3ZWVuIGxpZ2h0IGFuZCBkYXJrIE1hdGVyaWFsIHRoZW1lJywKICBpbnB1dFNjaGVtYTogeyB0eXBlOiAnb2JqZWN0JywKICAgIHByb3BlcnRpZXM6IHsgbW9kZTogeyBlbnVtOiBbJ2xpZ2h0JywgJ2RhcmsnXSB9IH0sCiAgICByZXF1aXJlZDogWydtb2RlJ10KICB9LAogIGV4ZWN1dGU6IGFzeW5jICh7IG1vZGUgfSkgPT4gc2V0TXVpVGhlbWUobW9kZSkKfSk7CmBgYAoKIyMjIFN0ZXAgMDUg4oCUIEFzc2VtYmxlIHRoZSBsYXllcnMgJiB3YXRjaCB0aGUgTExNIGluIGFjdGlvbgoKVGhyZWUgc2VydmVycyBjb2V4aXN0IGluIHRoZSBzYW1lIGxvb3AuIFRoZSBMTE0gc2VlcyBhbGwgb2YgdGhlbSBhbmQgcGlja3MgdGhlIHJpZ2h0IG9uZSBiYXNlZCBvbiBjb250ZXh0LgoKYGBgdHMKLy8gbWFpbi50cwppbXBvcnQgeyBydW5BZ2VudExvb3AsIEFudGhyb3BpY1Byb3ZpZGVyLCBhdXRvdWkgfSBmcm9tICdAd2VibWNwLWF1dG8tdWkvYWdlbnQnOwppbXBvcnQgeyBkZXNpZ25raXQgfSBmcm9tICcuL2Rlc2lnbmtpdC1zZXJ2ZXInOwppbXBvcnQgbXlBcGlDbGllbnQgZnJvbSAnLi9hcGktY2xpZW50JzsKCmNvbnN0IHJlc3VsdCA9IGF3YWl0IHJ1bkFnZW50TG9vcCgiU2hvdyB0aGlzIG1vbnRoJ3Mgb3JkZXJzIiwgewogIHByb3ZpZGVyOiBuZXcgQW50aHJvcGljUHJvdmlkZXIoeyBwcm94eVVybDogJy9hcGkvY2hhdCcgfSksCiAgbGF5ZXJzOiBbCiAgICBteUFwaUNsaWVudC5sYXllcigpLCAgLy8gbXlhcGlfbWNwXyogICAgICDihpIgYnVzaW5lc3MgZGF0YQogICAgYXV0b3VpLmxheWVyKCksICAgICAgIC8vIGF1dG91aV93ZWJtY3BfKiAgIOKGkiAzMSBuYXRpdmUgd2lkZ2V0cwogICAgZGVzaWdua2l0LmxheWVyKCksICAgIC8vIGRlc2lnbmtpdF93ZWJtY3BfKiDihpIgeW91ciBNVUkgY29tcG9uZW50cwogIF0sCiAgY2FsbGJhY2tzOiB7CiAgICBvbldpZGdldDogKHR5cGUsIGRhdGEpID0%2BIHJlbmRlcldpZGdldCh0eXBlLCBkYXRhKSwKICB9LAp9KTsKYGBgCgoqKkF1dG9tYXRpYyBMTE0gY2FsbCBzZXF1ZW5jZToqKgoKYGBganMKZGVzaWdua2l0X3dlYm1jcF9zZWFyY2hfcmVjaXBlcyh7IHF1ZXJ5OiAidGFibGUiIH0pCmRlc2lnbmtpdF93ZWJtY3BfZ2V0X3JlY2lwZSh7IG5hbWU6ICJEYXRhVGFibGUiIH0pCm15YXBpX21jcF9saXN0X29yZGVycyh7IG1vbnRoOiAiMjAyNi0wNCIsIGxpbWl0OiAxMDAgfSkKZGVzaWdua2l0X3dlYm1jcF93aWRnZXRfZGlzcGxheSh7CiAgbmFtZTogICAiRGF0YVRhYmxlIiwKICBwYXJhbXM6IHsKICAgIHRpdGxlOiAiT3JkZXJzIOKAlCBBcHJpbCAyMDI2IiwKICAgIHJvd3M6IFsuLi5dLAogICAgY29sdW1uczogWwogICAgICB7IGZpZWxkOiAiaWQiLCAgICAgaGVhZGVyTmFtZTogIiMiLCAgICAgICB3aWR0aDogODAgIH0sCiAgICAgIHsgZmllbGQ6ICJjbGllbnQiLCBoZWFkZXJOYW1lOiAiQ2xpZW50IiwgIHdpZHRoOiAyMDAgfSwKICAgICAgeyBmaWVsZDogInRvdGFsIiwgIGhlYWRlck5hbWU6ICJUb3RhbCAkIiwgd2lkdGg6IDEyMCB9LAogICAgXQogIH0KfSkKLy8g4oaSIHlvdXIgTVVJIGNvbXBvbmVudCByZW5kZXJzIHZpYSBvbldpZGdldApgYGAK" title="Share as hyperskill">Share as hyperskill</a></p>
+</footer>
+
+</div><!-- /page -->
+
+<script>
+// ── dark mode ────────────────────────────────────────────────────────────────
+function toggleDark() {
+  const dark = document.documentElement.classList.toggle('dark');
+  document.getElementById('icon-moon').style.display = dark ? 'none' : '';
+  document.getElementById('icon-sun').style.display  = dark ? '' : 'none';
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+}
+
+// init theme from storage or system preference
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') {
+    document.documentElement.classList.add('dark');
+    document.getElementById('icon-moon').style.display = 'none';
+    document.getElementById('icon-sun').style.display  = '';
+  }
+})();
+
+// ── i18n strings ──────────────────────────────────────────────────────────────
+const STRINGS = {
+  fr: {
+    'meta.title':    "Trois façons d'intégrer vos composants avec webmcp-auto-ui",
+    'meta.desc':     "Guide d'intégration de webmcp-auto-ui : Svelte, widgets natifs, ou Material UI.",
+    'nav.t1': 'Svelte', 'nav.t2': 'Natif', 'nav.t3': 'Material UI',
+    'hero.eyebrow':  'Documentation — Phase 8 · v2.1.1',
+    'hero.h1':       "Trois façons d'intégrer<br>vos composants avec<br><em>webmcp-auto-ui</em>",
+    'hero.desc':     "Créez un serveur WebMCP avec Svelte, intégrez les widgets natifs dans votre projet, ou construisez une bibliothèque Material UI — trois approches, un seul protocole.",
+    'hero.published':'Publié le', 'hero.by': 'Par',
+    'docs.link':     'https://jeanbaptiste.github.io/webmcp-auto-ui/fr/',
+    'docs.label':    'Documentation FR',
+    'index.t1.title':'Composants Svelte',
+    'index.t1.sub':  'Créer un serveur WebMCP complet avec vos widgets Svelte',
+    'index.t2.title':'Intégration native autoui',
+    'index.t2.sub':  'Intégrer les widgets natifs dans votre projet existant',
+    'index.t3.title':'Serveur Material UI',
+    'index.t3.sub':  'Construire sa propre bibliothèque designkit_webmcp_*',
+    't1.label':'Tutoriel 01', 't2.label':'Tutoriel 02', 't3.label':'Tutoriel 03',
+    't1.h2': "Ajouter vos propres<br>composants <em>Svelte</em>",
+    't1.desc': "Créez un serveur WebMCP avec vos widgets Svelte et exposez-les au LLM via des recettes — du composant au system prompt en cinq étapes.",
+    't1.s1.title': "Installer les packages &amp; créer la structure",
+    't1.s1.desc': "Ajoutez <span class='ic'>@webmcp-auto-ui/core</span> pour <span class='ic'>createWebMcpServer</span> et <span class='ic'>@webmcp-auto-ui/agent</span> pour la boucle agent et le serveur <span class='ic'>autoui</span> intégré.",
+    't1.s1.cm1': '# votre composant', 't1.s1.cm2': '# la recette pour le LLM', 't1.s1.cm3': '# définition du serveur WebMCP',
+    't1.s1.tip': "La recette est pour le LLM, le composant pour le rendu. Ils restent séparés jusqu'au <span class='ic'>registerWidget</span>.",
+    't1.s2.title': "Écrire l'interface Props du composant",
+    't1.s2.desc': "L'interface <span class='ic'>Props</span> TypeScript est la <strong>source de vérité unique</strong>. Le schema JSON est auto-généré via <span class='ic'>ts-json-schema-generator</span> — ne l'écrivez jamais à la main.",
+    't1.s2.tip': "<span class='ic'>ts-json-schema-generator</span> lit le TypeScript pur — compatible Svelte 5, React, Vue et tout framework exposant une interface Props TS.",
+    't1.s3.title': "Créer la recette <span class='ic'>.md</span>",
+    't1.s3.desc': "Le frontmatter <span class='ic'>schema:</span> est injecté automatiquement. Écrivez uniquement le body — votre documentation pour le LLM. Le champ <span class='ic'>widget:</span> est obligatoire.",
+    't1.s3.recipe.desc': "Tableau kanban avec colonnes et cartes,\n  idéal pour un workflow ou un backlog agile.",
+    't1.s3.recipe.body': "## Quand utiliser ce widget\nAfficher un backlog ou tout ensemble de tâches organisées en colonnes.\n\n## Comment récupérer les données\nAppeler `monprojet_mcp_get_tasks`, mapper par statut en `columns[]`.",
+    't1.s3.todo': '"À faire"', 't1.s3.doing': '"En cours"',
+    't1.s3.tip': "<span class='ic'>widget_display</span> prend <span class='ic'>name</span> et <span class='ic'>params</span> — pas un objet fusionné.",
+    't1.s4.title': 'Enregistrer le serveur WebMCP',
+    't1.s4.desc': "Associez recette + composant dans <span class='ic'>server.ts</span>, puis ajoutez le layer à la boucle agent.",
+    't1.s4.serverdesc': "'Widgets Svelte de Mon Application'",
+    't1.s4.prompt': "'Affiche le board'",
+    't1.s4.c1': '// mydata_mcp_*   → données', 't1.s4.c2': '// autoui_webmcp_* → widgets natifs', 't1.s4.c3': '// mywidgets_webmcp_*  → vos widgets',
+    't1.s4.tip': "Le LLM verra automatiquement <span class='ic'>mywidgets_webmcp_search_recipes</span>, <span class='ic'>mywidgets_webmcp_get_recipe</span> et <span class='ic'>mywidgets_webmcp_widget_display</span>.",
+    't1.s5.title': "Synchroniser les schemas &amp; valider en CI",
+    't1.s5.desc': "Pipeline entièrement automatisé — une seule source de vérité du dev jusqu'au LLM.",
+    't1.s5.f1': '— vous écrivez ici', 't1.s5.f2': '— auto-injecté', 't1.s5.f3': '↓ consommé par', 't1.s5.f4': '— lu &amp; validé',
+    't1.s5.cm1': '# Développement — injecte les schemas dans les .md', 't1.s5.cm2': '# CI — échoue si les .md ne sont pas à jour',
+    't2.h2': "Intégrer les widgets<br><em>autoui</em> natifs",
+    't2.desc': "Utilisez le serveur <span class='ic'>autoui</span> intégré à <span class='ic'>@webmcp-auto-ui/agent</span> pour accéder aux 31 widgets natifs sans configurer de serveur WebMCP custom.",
+    't2.s1.title': 'Installer le package agent',
+    't2.s1.desc': "<span class='ic'>@webmcp-auto-ui/agent</span> exporte directement <span class='ic'>autoui</span> — un serveur WebMCP pré-configuré avec tous les widgets natifs (stat, table, chart, timeline, hemicycle…).",
+    't2.s1.usagelabel': 'usage immédiat',
+    't2.s1.cm1': '// autoui = WebMcpServer avec tous les widgets natifs déjà enregistrés',
+    't2.s1.cm2': "// → { protocol: 'webmcp', serverName: 'autoui', tools: [...] }",
+    't2.s2.title': "Brancher l'agent avec <span class='ic'>runAgentLoop</span>",
+    't2.s2.desc': "<span class='ic'>runAgentLoop</span> prend le message utilisateur en premier argument, puis un objet d'options.",
+    't2.s2.prompt': "'Montre-moi les données de ventes'",
+    't2.s2.c1': '// monapi_mcp_*   → vos données', 't2.s2.c2': '// autoui_webmcp_* → 31 widgets natifs',
+    't2.s2.cm1': '// type = nom du widget, data = paramètres validés',
+    't2.s2.tip': "<span class='ic'>onWidget</span> remplace l'ancien <span class='ic'>onBlock</span> (alias déprécié). Il reçoit le type et les données déjà validées.",
+    't2.s3.title': 'Configurer le proxy API SvelteKit',
+    't2.s3.desc': "<span class='ic'>AnthropicProvider</span> envoie les requêtes à un endpoint local qui détient la clé API.",
+    't2.s3.tip': "La clé est lue depuis <span class='ic'>ANTHROPIC_API_KEY</span> dans <span class='ic'>.env</span>, ou passée à la volée via <span class='ic'>body.__apiKey</span>.",
+    't3.h2': "Créer un serveur WebMCP<br>avec <em>Material UI</em>",
+    't3.desc': "Construisez votre propre bibliothèque de composants MUI et exposez-les comme un serveur <span class='ic'>designkit_webmcp_*</span> distinct.",
+    't3.s1.title': 'Installer les dépendances',
+    't3.s2.title': 'Créer un composant React avec interface Props',
+    't3.s2.desc': "L'interface TypeScript est la source de vérité du schema JSON — même principe qu'en Svelte.",
+    't3.s2.cm1': '// Source de vérité → schema JSON auto-généré depuis ici',
+    't3.s3.title': "Créer la recette &amp; synchroniser le schema",
+    't3.s3.recipe.desc': "Grille MUI avec pagination\n  et tri.",
+    't3.s3.recipe.body': "## Quand l'utiliser\nListes longues avec tri.\n\n## Données\nVia `*_mcp_list_*` → `rows[]`.",
+    't3.s3.ci': '# CI check', 't3.s3.tip': "CI échoue si <span class='ic'>DataTableProps</span> diverge du <span class='ic'>schema:</span> dans le <span class='ic'>.md</span>.",
+    't3.s4.title': 'Créer le serveur designkit',
+    't3.s4.serverdesc': "'Composants Material Design (DataTable, Dialog...)'",
+    't3.s4.cm1': '// Tool custom — piloté directement par le LLM',
+    't3.s4.themedesc': "'Bascule entre thème clair et sombre'",
+    't3.s5.title': "Assembler les layers &amp; voir le LLM en action",
+    't3.s5.desc': "Trois serveurs coexistent dans la même boucle. Le LLM les voit tous et choisit le bon selon le contexte.",
+    't3.s5.prompt': "'Affiche les commandes du mois'",
+    't3.s5.c1': '// myapi_mcp_*      → données métier', 't3.s5.c2': '// autoui_webmcp_*   → 31 widgets natifs', 't3.s5.c3': '// designkit_webmcp_* → vos composants MUI',
+    't3.s5.seqlabel': "séquence d'appels LLM automatique",
+    't3.s5.q': '"tableau"', 't3.s5.tabtitle': '"Commandes — Avril 2026"',
+    't3.s5.col1': '"Client"', 't3.s5.col2': '"Total €"',
+    't3.s5.cmfinal': '// → votre composant MUI s\'affiche via onWidget',
+    'footer.note': "Un protocole symétrique à MCP pour l'affichage &amp; l'interaction",
+    'footer.published': 'Publié le', 'footer.date': '11 avril 2026',
+  },
+  en: {
+    'meta.title':    "Three ways to integrate your components with webmcp-auto-ui",
+    'meta.desc':     "Integration guide for webmcp-auto-ui: Svelte, native widgets, or Material UI — three approaches, one protocol.",
+    'nav.t1': 'Svelte', 'nav.t2': 'Native', 'nav.t3': 'Material UI',
+    'hero.eyebrow':  'Documentation — Phase 8 · v2.1.1',
+    'hero.h1':       "Three ways to integrate<br>your components with<br><em>webmcp-auto-ui</em>",
+    'hero.desc':     "Create a WebMCP server with Svelte, integrate native widgets into your existing project, or build a Material UI library — three approaches, one protocol.",
+    'hero.published':'Published', 'hero.by': 'By',
+    'docs.link':     'https://jeanbaptiste.github.io/webmcp-auto-ui/en/',
+    'docs.label':    'Documentation EN',
+    'index.t1.title':'Svelte components',
+    'index.t1.sub':  'Build a full WebMCP server with your own Svelte widgets',
+    'index.t2.title':'Native autoui integration',
+    'index.t2.sub':  'Drop native widgets into your existing project',
+    'index.t3.title':'Material UI server',
+    'index.t3.sub':  'Build your own designkit_webmcp_* library',
+    't1.label':'Tutorial 01', 't2.label':'Tutorial 02', 't3.label':'Tutorial 03',
+    't1.h2': "Add your own<br><em>Svelte</em> components",
+    't1.desc': "Create a WebMCP server with your Svelte widgets and expose them to the LLM through recipes — from component to system prompt in five steps.",
+    't1.s1.title': "Install packages &amp; create the structure",
+    't1.s1.desc': "Add <span class='ic'>@webmcp-auto-ui/core</span> for <span class='ic'>createWebMcpServer</span> and <span class='ic'>@webmcp-auto-ui/agent</span> for the agent loop and the built-in <span class='ic'>autoui</span> server.",
+    't1.s1.cm1': '# your component', 't1.s1.cm2': '# the recipe for the LLM', 't1.s1.cm3': '# WebMCP server definition',
+    't1.s1.tip': "The recipe is for the LLM, the component is for rendering. They stay separate until <span class='ic'>registerWidget</span>.",
+    't1.s2.title': "Write the component Props interface",
+    't1.s2.desc': "The TypeScript <span class='ic'>Props</span> interface is the <strong>single source of truth</strong>. The JSON schema is auto-generated via <span class='ic'>ts-json-schema-generator</span> — never write it by hand.",
+    't1.s2.tip': "<span class='ic'>ts-json-schema-generator</span> reads pure TypeScript — compatible with Svelte 5, React, Vue and any framework exposing a TS Props interface.",
+    't1.s3.title': "Create the recipe <span class='ic'>.md</span>",
+    't1.s3.desc': "The frontmatter <span class='ic'>schema:</span> is auto-injected. Write only the body — your documentation for the LLM. The <span class='ic'>widget:</span> field is required.",
+    't1.s3.recipe.desc': "Kanban board with draggable columns and cards,\n  ideal for a workflow or agile backlog.",
+    't1.s3.recipe.body': "## When to use this widget\nDisplay a backlog or any set of tasks organized into columns.\n\n## How to fetch data\nCall `myproject_mcp_get_tasks`, map by status into `columns[]`.",
+    't1.s3.todo': '"To do"', 't1.s3.doing': '"In progress"',
+    't1.s3.tip': "<span class='ic'>widget_display</span> takes <span class='ic'>name</span> and <span class='ic'>params</span> — not a single merged object.",
+    't1.s4.title': 'Register the WebMCP server',
+    't1.s4.desc': "Associate recipe + component in <span class='ic'>server.ts</span>, then add the layer to the agent loop.",
+    't1.s4.serverdesc': "'My Application Svelte Widgets'",
+    't1.s4.prompt': "'Show the board'",
+    't1.s4.c1': '// mydata_mcp_*   → data', 't1.s4.c2': '// autoui_webmcp_* → native widgets', 't1.s4.c3': '// mywidgets_webmcp_*  → your widgets',
+    't1.s4.tip': "The LLM will automatically see <span class='ic'>mywidgets_webmcp_search_recipes</span>, <span class='ic'>mywidgets_webmcp_get_recipe</span> and <span class='ic'>mywidgets_webmcp_widget_display</span>.",
+    't1.s5.title': "Sync schemas &amp; validate in CI",
+    't1.s5.desc': "Fully automated pipeline — one source of truth from dev to LLM.",
+    't1.s5.f1': '— you write here', 't1.s5.f2': '— auto-injected', 't1.s5.f3': '↓ consumed by', 't1.s5.f4': '— read &amp; validated',
+    't1.s5.cm1': '# Development — injects schemas into .md files', 't1.s5.cm2': '# CI — fails if .md files are out of sync',
+    't2.h2': "Integrate the native<br><em>autoui</em> widgets",
+    't2.desc': "Use the <span class='ic'>autoui</span> server built into <span class='ic'>@webmcp-auto-ui/agent</span> to access all 31 native widgets without configuring a custom WebMCP server.",
+    't2.s1.title': 'Install the agent package',
+    't2.s1.desc': "<span class='ic'>@webmcp-auto-ui/agent</span> directly exports <span class='ic'>autoui</span> — a pre-configured WebMCP server with all native widgets registered (stat, table, chart, timeline, hemicycle…).",
+    't2.s1.usagelabel': 'immediate usage',
+    't2.s1.cm1': '// autoui = WebMcpServer with all native widgets already registered',
+    't2.s1.cm2': "// → { protocol: 'webmcp', serverName: 'autoui', tools: [...] }",
+    't2.s2.title': "Connect the agent with <span class='ic'>runAgentLoop</span>",
+    't2.s2.desc': "<span class='ic'>runAgentLoop</span> takes the user message as its first argument, then an options object.",
+    't2.s2.prompt': "'Show me sales data'",
+    't2.s2.c1': '// myapi_mcp_*   → your data', 't2.s2.c2': '// autoui_webmcp_* → 31 native widgets',
+    't2.s2.cm1': '// type = widget name, data = validated parameters',
+    't2.s2.tip': "<span class='ic'>onWidget</span> replaces the old <span class='ic'>onBlock</span> (deprecated alias). It receives the type and schema-validated data.",
+    't2.s3.title': 'Set up the SvelteKit API proxy',
+    't2.s3.desc': "<span class='ic'>AnthropicProvider</span> sends requests to a local endpoint that holds the API key.",
+    't2.s3.tip': "The key is read from <span class='ic'>ANTHROPIC_API_KEY</span> in <span class='ic'>.env</span>, or passed at runtime via <span class='ic'>body.__apiKey</span>.",
+    't3.h2': "Build a WebMCP server<br>with <em>Material UI</em>",
+    't3.desc': "Build your own MUI component library and expose it as a distinct <span class='ic'>designkit_webmcp_*</span> server.",
+    't3.s1.title': 'Install dependencies',
+    't3.s2.title': 'Create a React component with a Props interface',
+    't3.s2.desc': "The TypeScript interface is the source of truth for the JSON schema — same principle as Svelte.",
+    't3.s2.cm1': '// Source of truth → JSON schema auto-generated from here',
+    't3.s3.title': "Create the recipe &amp; sync the schema",
+    't3.s3.recipe.desc': "MUI grid with pagination\n  and sorting.",
+    't3.s3.recipe.body': "## When to use\nLong lists with sorting.\n\n## Data\nFetch via `*_mcp_list_*` → `rows[]`.",
+    't3.s3.ci': '# CI check', 't3.s3.tip': "CI fails if <span class='ic'>DataTableProps</span> diverges from the <span class='ic'>schema:</span> in the <span class='ic'>.md</span>.",
+    't3.s4.title': 'Create the designkit server',
+    't3.s4.serverdesc': "'Material Design components (DataTable, Dialog...)'",
+    't3.s4.cm1': '// Custom tool — called directly by the LLM',
+    't3.s4.themedesc': "'Switch between light and dark Material theme'",
+    't3.s5.title': "Assemble the layers &amp; watch the LLM in action",
+    't3.s5.desc': "Three servers coexist in the same loop. The LLM sees all of them and picks the right one based on context.",
+    't3.s5.prompt': "\"Show this month's orders\"",
+    't3.s5.c1': '// myapi_mcp_*      → business data', 't3.s5.c2': '// autoui_webmcp_*   → 31 native widgets', 't3.s5.c3': '// designkit_webmcp_* → your MUI components',
+    't3.s5.seqlabel': 'automatic LLM call sequence',
+    't3.s5.q': '"table"', 't3.s5.tabtitle': '"Orders — April 2026"',
+    't3.s5.col1': '"Client"', 't3.s5.col2': '"Total $"',
+    't3.s5.cmfinal': '// → your MUI component renders via onWidget',
+    'footer.note': "A symmetric protocol to MCP for display &amp; interaction",
+    'footer.published': 'Published', 'footer.date': 'April 11, 2026',
+  }
+};
+
+let currentLang = (navigator.language || 'fr').startsWith('en') ? 'en' : 'fr';
+
+function setLang(lang) {
+  currentLang = lang;
+  const s = STRINGS[lang];
+
+  // html lang attr + canonical
+  document.documentElement.lang = lang;
+  document.querySelector('[rel=canonical]').href =
+    lang === 'fr'
+      ? 'https://jeanbaptiste.github.io/webmcp-auto-ui/fr/guides/integration/'
+      : 'https://jeanbaptiste.github.io/webmcp-auto-ui/en/guides/integration/';
+
+  // meta title + og
+  document.title = s['meta.title'];
+  document.querySelector('[name=description]').content = s['meta.desc'];
+  document.querySelector('[property="og:title"]').content = s['meta.title'];
+  document.querySelector('[property="og:description"]').content = s['meta.desc'];
+  document.querySelector('[property="og:locale"]').content = lang === 'fr' ? 'fr_FR' : 'en_US';
+
+  // ld+json
+  const ld = JSON.parse(document.getElementById('ld-json').textContent);
+  ld.headline = s['meta.title'];
+  ld.inLanguage = lang;
+  document.getElementById('ld-json').textContent = JSON.stringify(ld);
+
+  // all data-i18n text nodes
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (s[key] !== undefined) el.innerHTML = s[key];
+  });
+
+  // data-i18n-href links
+  document.querySelectorAll('[data-i18n-href]').forEach(el => {
+    const key = el.getAttribute('data-i18n-href');
+    if (s[key] !== undefined) el.href = s[key];
+  });
+
+  // lang buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent === lang.toUpperCase());
+  });
+}
+
+// accordion
+function tog(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// init on load
+setLang(currentLang);
+</script>
+
+</body>
+</html>
