@@ -55,6 +55,17 @@ for f in "$REPO_DIR"/*.html; do
   if ! grep -qi 'CC BY-SA' "$f"; then
     echo "  WARN: no CC BY-SA in $name"
   fi
+
+  # GoatCounter tracking — auto-inject if missing
+  if ! grep -q 'goat.cybernego.com/count' "$f"; then
+    if grep -q '</body>' "$f"; then
+      sed -i '' 's|</body>|<script>window.goatcounter = { path: function(p) { return location.host + p } }</script>\n<script data-goatcounter="https://goat.cybernego.com/count"\n        async src="//goat.cybernego.com/count.js"></script>\n</body>|' "$f"
+      echo "  INJECTED: GoatCounter snippet added"
+    else
+      echo "  FAIL: no </body> found — cannot inject GoatCounter"
+      ERRORS=$((ERRORS + 1))
+    fi
+  fi
 done
 
 if [ "$ERRORS" -gt 0 ]; then
